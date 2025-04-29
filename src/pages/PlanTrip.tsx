@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
@@ -382,54 +381,58 @@ export default function PlanTrip() {
                     {currentStep === 5 && (
                       <div className="space-y-4">
                         <Label>What are your food preferences?</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-4">
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
-                            onClick={() => methods.setValue("foodPreference", "vegetarian")}
-                          >
-                            <div className="flex items-center gap-3">
-                              <RadioGroupItem value="vegetarian" id="food-vegetarian" checked={methods.watch("foodPreference") === "vegetarian"} />
-                              <label htmlFor="food-vegetarian" className="text-base font-medium cursor-pointer flex-1">
-                                Vegetarian
-                              </label>
-                            </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "non-vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
-                            onClick={() => methods.setValue("foodPreference", "non-vegetarian")}
-                          >
-                            <div className="flex items-center gap-3">
-                              <RadioGroupItem value="non-vegetarian" id="food-non-vegetarian" checked={methods.watch("foodPreference") === "non-vegetarian"} />
-                              <label htmlFor="food-non-vegetarian" className="text-base font-medium cursor-pointer flex-1">
-                                Non-Vegetarian
-                              </label>
-                            </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegan" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
-                            onClick={() => methods.setValue("foodPreference", "vegan")}
-                          >
-                            <div className="flex items-center gap-3">
-                              <RadioGroupItem value="vegan" id="food-vegan" checked={methods.watch("foodPreference") === "vegan"} />
-                              <label htmlFor="food-vegan" className="text-base font-medium cursor-pointer flex-1">
-                                Vegan
-                              </label>
-                            </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "no-preference" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
-                            onClick={() => methods.setValue("foodPreference", "no-preference")}
-                          >
-                            <div className="flex items-center gap-3">
-                              <RadioGroupItem value="no-preference" id="food-no-preference" checked={methods.watch("foodPreference") === "no-preference"} />
-                              <label htmlFor="food-no-preference" className="text-base font-medium cursor-pointer flex-1">
-                                No Preference
-                              </label>
-                            </div>
-                          </Card>
-                        </div>
+                        <RadioGroup 
+                          value={methods.watch("foodPreference") || ""} 
+                          onValueChange={(value) => methods.setValue("foodPreference", value)}
+                        >
+                          <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-4">
+                            <Card 
+                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                              onClick={() => methods.setValue("foodPreference", "vegetarian")}
+                            >
+                              <div className="flex items-center gap-3">
+                                <RadioGroupItem value="vegetarian" id="food-vegetarian" />
+                                <label htmlFor="food-vegetarian" className="text-base font-medium cursor-pointer flex-1">
+                                  Vegetarian
+                                </label>
+                              </div>
+                            </Card>
+                            <Card 
+                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "non-vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                              onClick={() => methods.setValue("foodPreference", "non-vegetarian")}
+                            >
+                              <div className="flex items-center gap-3">
+                                <RadioGroupItem value="non-vegetarian" id="food-non-vegetarian" />
+                                <label htmlFor="food-non-vegetarian" className="text-base font-medium cursor-pointer flex-1">
+                                  Non-Vegetarian
+                                </label>
+                              </div>
+                            </Card>
+                            <Card 
+                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegan" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                              onClick={() => methods.setValue("foodPreference", "vegan")}
+                            >
+                              <div className="flex items-center gap-3">
+                                <RadioGroupItem value="vegan" id="food-vegan" />
+                                <label htmlFor="food-vegan" className="text-base font-medium cursor-pointer flex-1">
+                                  Vegan
+                                </label>
+                              </div>
+                            </Card>
+                            <Card 
+                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "no-preference" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                              onClick={() => methods.setValue("foodPreference", "no-preference")}
+                            >
+                              <div className="flex items-center gap-3">
+                                <RadioGroupItem value="no-preference" id="food-no-preference" />
+                                <label htmlFor="food-no-preference" className="text-base font-medium cursor-pointer flex-1">
+                                  No Preference
+                                </label>
+                              </div>
+                            </Card>
+                          </div>
+                        </RadioGroup>
                         
-                        {/* FIX: Remove the onClick handler from Card and handle the checkbox separately */}
                         <Card className={`p-4 cursor-pointer transition-all ${methods.watch("localFood") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
                           <div className="flex items-center gap-3">
                             <Checkbox 
