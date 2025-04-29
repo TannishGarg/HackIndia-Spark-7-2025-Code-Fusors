@@ -2,20 +2,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  ArrowRight,
-  AtSign,
-  Building2,
-  Check,
-  Compass,
-  MapPin,
-  Phone,
-  Send,
-} from "lucide-react";
+import { ArrowRight, Mail, MapPin, Phone, Send, CircleCheck } from "lucide-react";
 
 export default function Contact() {
   const { toast } = useToast();
@@ -26,9 +18,9 @@ export default function Contact() {
     message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormState(prev => ({ ...prev, [name]: value }));
   };
@@ -36,137 +28,221 @@ export default function Contact() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate form submission
+    
+    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      setIsSubmitted(true);
+      setIsSuccess(true);
       
       toast({
         title: "Message sent successfully!",
         description: "We'll get back to you as soon as possible.",
       });
       
-      // Reset form after a delay
+      // Reset form after showing success message
       setTimeout(() => {
-        setIsSubmitted(false);
         setFormState({
           name: "",
           email: "",
           subject: "",
           message: ""
         });
+        setIsSuccess(false);
       }, 3000);
     }, 1500);
   };
 
   return (
-    <div className="container mx-auto py-12 px-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-12"
-      >
-        <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Have questions about GoGinie? Our team is here to help you plan your perfect trip.
-        </p>
-      </motion.div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="container py-8 px-4"
+    >
+      {/* Hero Section */}
+      <section className="mb-16">
+        <div className="text-center mb-8">
+          <motion.h1 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-3xl md:text-5xl font-bold mb-4"
+          >
+            Contact <span className="text-goginie-primary">GoGinie</span>
+          </motion.h1>
+          <motion.p 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-xl text-muted-foreground max-w-2xl mx-auto"
+          >
+            Have questions or feedback? We'd love to hear from you!
+          </motion.p>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      {/* Contact Form and Info */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-16">
+        {/* Contact Information */}
         <motion.div 
+          className="md:col-span-2"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="lg:col-span-2"
+          transition={{ delay: 0.2 }}
         >
-          <Card>
-            <CardContent className="p-6">
-              {isSubmitted ? (
+          <Card className="h-full bg-gradient-to-br from-goginie-primary/20 to-goginie-secondary/10">
+            <CardContent className="p-8 flex flex-col h-full">
+              <h2 className="text-2xl font-bold mb-6">Get in Touch</h2>
+              
+              <div className="space-y-6 flex-grow">
+                <div className="flex items-start gap-4">
+                  <div className="bg-goginie-primary/10 p-3 rounded-full">
+                    <Mail className="h-6 w-6 text-goginie-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Email Us</h3>
+                    <p className="text-muted-foreground mb-1">For general inquiries:</p>
+                    <a href="mailto:hello@goginie.com" className="text-goginie-primary hover:underline">
+                      hello@goginie.com
+                    </a>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="bg-goginie-primary/10 p-3 rounded-full">
+                    <Phone className="h-6 w-6 text-goginie-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Call Us</h3>
+                    <p className="text-muted-foreground mb-1">Monday to Friday, 9am-6pm IST</p>
+                    <a href="tel:+919876543210" className="text-goginie-primary hover:underline">
+                      +91 98765 43210
+                    </a>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="bg-goginie-primary/10 p-3 rounded-full">
+                    <MapPin className="h-6 w-6 text-goginie-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Visit Us</h3>
+                    <p className="text-muted-foreground">
+                      GoGinie Technologies<br />
+                      123 Innovation Street<br />
+                      Bengaluru, Karnataka 560001<br />
+                      India
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-8 pt-6 border-t">
+                <h3 className="font-medium mb-3">Follow Us</h3>
+                <div className="flex gap-4">
+                  {["Twitter", "LinkedIn", "Instagram", "Facebook"].map((social) => (
+                    <Button key={social} variant="outline" size="sm" className="rounded-full">
+                      {social}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        
+        {/* Contact Form */}
+        <motion.div 
+          className="md:col-span-3"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="h-full">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
+              
+              {isSuccess ? (
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-12"
                 >
-                  <div className="rounded-full bg-green-100 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                    <Check className="h-8 w-8 text-green-600" />
+                  <div className="bg-goginie-primary/10 p-4 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                    <CircleCheck className="h-10 w-10 text-goginie-primary" />
                   </div>
                   <h3 className="text-2xl font-bold mb-2">Message Sent!</h3>
                   <p className="text-muted-foreground mb-6">
-                    Thank you for reaching out. We'll get back to you as soon as possible.
+                    Thank you for reaching out. We'll get back to you shortly.
                   </p>
-                  <Button onClick={() => setIsSubmitted(false)}>
-                    Send Another Message
-                  </Button>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <h2 className="text-2xl font-bold mb-6">Get in Touch</h2>
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-medium">Your Name</label>
+                      <Label htmlFor="name">Your Name</Label>
                       <Input 
-                        id="name" 
+                        id="name"
                         name="name" 
-                        placeholder="John Doe" 
-                        value={formState.name}
-                        onChange={handleInputChange}
+                        placeholder="John Doe"
                         required
+                        value={formState.name}
+                        onChange={handleChange}
                       />
                     </div>
-                    
                     <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">Email Address</label>
+                      <Label htmlFor="email">Email Address</Label>
                       <Input 
-                        id="email" 
+                        id="email"
                         name="email" 
                         type="email" 
-                        placeholder="john@example.com" 
-                        value={formState.email}
-                        onChange={handleInputChange}
+                        placeholder="john@example.com"
                         required
+                        value={formState.email}
+                        onChange={handleChange}
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="subject" className="text-sm font-medium">Subject</label>
+                    <Label htmlFor="subject">Subject</Label>
                     <Input 
-                      id="subject" 
+                      id="subject"
                       name="subject" 
-                      placeholder="How can we help you?" 
-                      value={formState.subject}
-                      onChange={handleInputChange}
+                      placeholder="How can we help you?"
                       required
+                      value={formState.subject}
+                      onChange={handleChange}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium">Message</label>
+                    <Label htmlFor="message">Your Message</Label>
                     <Textarea 
-                      id="message" 
+                      id="message"
                       name="message" 
-                      placeholder="Tell us what you need help with..." 
-                      rows={5} 
-                      value={formState.message}
-                      onChange={handleInputChange}
+                      placeholder="Write your message here..."
+                      rows={6}
                       required
+                      value={formState.message}
+                      onChange={handleChange}
                     />
                   </div>
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-goginie-primary hover:bg-goginie-secondary flex items-center gap-2 justify-center"
+                    className="w-full"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      "Sending message..."
+                      <span className="flex items-center gap-2">
+                        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                        Sending...
+                      </span>
                     ) : (
-                      <>
+                      <span className="flex items-center gap-2">
                         Send Message <Send className="h-4 w-4" />
-                      </>
+                      </span>
                     )}
                   </Button>
                 </form>
@@ -174,106 +250,69 @@ export default function Contact() {
             </CardContent>
           </Card>
         </motion.div>
-        
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="text-xl font-bold mb-6">Contact Information</h2>
-              
-              <div className="space-y-6">
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-goginie-primary/10 p-2">
-                    <Building2 className="h-5 w-5 text-goginie-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-base">Our Office</h3>
-                    <p className="text-muted-foreground text-sm">
-                      GoGinie Headquarters<br />
-                      Tech Park, Bengaluru<br />
-                      Karnataka, India 560001
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-goginie-primary/10 p-2">
-                    <Phone className="h-5 w-5 text-goginie-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-base">Phone</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Customer Support: +91 9876543210<br />
-                      Business Inquiries: +91 9876543211
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-goginie-primary/10 p-2">
-                    <AtSign className="h-5 w-5 text-goginie-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-base">Email</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Support: support@goginie.com<br />
-                      Info: info@goginie.com
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="pt-4 mt-4 border-t">
-                  <h3 className="font-medium text-base mb-3">Follow Us</h3>
-                  <div className="flex gap-3">
-                    {["Twitter", "Facebook", "Instagram", "LinkedIn"].map((social) => (
-                      <a 
-                        key={social} 
-                        href="#" 
-                        className="bg-goginie-primary/10 hover:bg-goginie-primary/20 rounded-full w-9 h-9 flex items-center justify-center transition-colors"
-                      >
-                        <span className="sr-only">{social}</span>
-                        <Compass className="h-4 w-4 text-goginie-primary" />
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <div className="mt-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-goginie-primary/10 p-2">
-                    <MapPin className="h-5 w-5 text-goginie-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-base mb-2">Visit Us</h3>
-                    <div className="aspect-video w-full bg-muted rounded-md overflow-hidden">
-                      <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.01693789906!2d77.59393316482937!3d12.971599890855802!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae167d241c03c3%3A0xdf6d60ab4586d0c8!2sUB%20City!5e0!3m2!1sen!2sin!4v1666099439603!5m2!1sen!2sin" 
-                        width="100%" 
-                        height="100%" 
-                        style={{ border: 0 }}
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      ></iframe>
-                    </div>
-                    <Button variant="link" className="p-0 h-auto mt-2 text-goginie-primary">
-                      Get Directions <ArrowRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </motion.div>
       </div>
-    </div>
+      
+      {/* FAQ Section */}
+      <section className="mb-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Find quick answers to common questions about GoGinie
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[
+            {
+              question: "How does GoGinie create travel plans?",
+              answer: "GoGinie uses advanced AI algorithms to analyze your preferences, interests, and budget to create personalized travel itineraries tailored specifically to you."
+            },
+            {
+              question: "Is GoGinie free to use?",
+              answer: "GoGinie offers both free and premium plans. Basic travel planning is available for free, while advanced features and personalized support are available with our premium plans."
+            },
+            {
+              question: "Can I modify my trip plan after it's generated?",
+              answer: "Absolutely! You can edit any aspect of your trip plan, add or remove activities, change accommodations, and adjust your itinerary at any time."
+            },
+            {
+              question: "How far in advance should I plan my trip?",
+              answer: "For the best results, we recommend planning at least 3-4 weeks before your trip to ensure availability for accommodations and activities, especially during peak travel seasons."
+            },
+          ].map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * index }}
+            >
+              <Card className="h-full">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{item.question}</h3>
+                  <p className="text-muted-foreground">{item.answer}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+      
+      {/* CTA Section */}
+      <section>
+        <Card className="bg-gradient-to-r from-goginie-primary/20 to-goginie-secondary/10 border-none">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Plan Your Dream Trip?</h2>
+            <p className="text-lg mb-6 max-w-2xl mx-auto">
+              Let GoGinie's AI craft the perfect travel itinerary for your next adventure
+            </p>
+            <Button size="lg" asChild>
+              <a href="/plan-trip" className="flex items-center gap-2">
+                Plan Your Trip Now <ArrowRight className="h-5 w-5" />
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      </section>
+    </motion.div>
   );
 }
