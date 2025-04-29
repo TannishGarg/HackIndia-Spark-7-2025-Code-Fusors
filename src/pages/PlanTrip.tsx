@@ -275,50 +275,54 @@ export default function PlanTrip() {
                       <div className="space-y-4">
                         <Label>Select your interests</Label>
                         <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("adventure") ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => handleInterestChange("adventure")}>
+                          {/* FIX: Remove the onClick handler from Card and use separate handler */}
+                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("adventure") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
                             <div className="flex items-center gap-3">
                               <Checkbox 
                                 id="interest-adventure" 
                                 checked={methods.watch("interests")?.includes("adventure")}
                                 onCheckedChange={() => handleInterestChange("adventure")}
                               />
-                              <label htmlFor="interest-adventure" className="text-base font-medium cursor-pointer flex-1">
+                              <label htmlFor="interest-adventure" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("adventure")}>
                                 Adventure
                               </label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("culture") ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => handleInterestChange("culture")}>
+                          
+                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("culture") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
                             <div className="flex items-center gap-3">
                               <Checkbox 
                                 id="interest-culture" 
                                 checked={methods.watch("interests")?.includes("culture")}
                                 onCheckedChange={() => handleInterestChange("culture")}
                               />
-                              <label htmlFor="interest-culture" className="text-base font-medium cursor-pointer flex-1">
+                              <label htmlFor="interest-culture" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("culture")}>
                                 Culture
                               </label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("foodie") ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => handleInterestChange("foodie")}>
+                          
+                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("foodie") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
                             <div className="flex items-center gap-3">
                               <Checkbox 
                                 id="interest-foodie" 
                                 checked={methods.watch("interests")?.includes("foodie")}
                                 onCheckedChange={() => handleInterestChange("foodie")}
                               />
-                              <label htmlFor="interest-foodie" className="text-base font-medium cursor-pointer flex-1">
+                              <label htmlFor="interest-foodie" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("foodie")}>
                                 Foodie
                               </label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("relaxation") ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => handleInterestChange("relaxation")}>
+                          
+                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("relaxation") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
                             <div className="flex items-center gap-3">
                               <Checkbox 
                                 id="interest-relaxation" 
                                 checked={methods.watch("interests")?.includes("relaxation")}
                                 onCheckedChange={() => handleInterestChange("relaxation")}
                               />
-                              <label htmlFor="interest-relaxation" className="text-base font-medium cursor-pointer flex-1">
+                              <label htmlFor="interest-relaxation" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("relaxation")}>
                                 Relaxation
                               </label>
                             </div>
@@ -331,28 +335,40 @@ export default function PlanTrip() {
                       <div className="space-y-4">
                         <Label>How many people are traveling?</Label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 1 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("travelGroupSize", 1)}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 1 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("travelGroupSize", 1)}
+                          >
                             <div className="flex flex-col items-center gap-2 py-2">
                               <Users className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Solo</label>
                               <span className="text-sm text-muted-foreground">1 Person</span>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 2 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("travelGroupSize", 2)}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 2 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("travelGroupSize", 2)}
+                          >
                             <div className="flex flex-col items-center gap-2 py-2">
                               <Users className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Couple</label>
                               <span className="text-sm text-muted-foreground">2 People</span>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 4 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("travelGroupSize", 4)}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 4 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("travelGroupSize", 4)}
+                          >
                             <div className="flex flex-col items-center gap-2 py-2">
                               <Users className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Family</label>
                               <span className="text-sm text-muted-foreground">4 People</span>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 6 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("travelGroupSize", 6)}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 6 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("travelGroupSize", 6)}
+                          >
                             <div className="flex flex-col items-center gap-2 py-2">
                               <Users className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Friends</label>
@@ -367,7 +383,10 @@ export default function PlanTrip() {
                       <div className="space-y-4">
                         <Label>What are your food preferences?</Label>
                         <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-4">
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("foodPreference", "vegetarian")}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("foodPreference", "vegetarian")}
+                          >
                             <div className="flex items-center gap-3">
                               <RadioGroupItem value="vegetarian" id="food-vegetarian" checked={methods.watch("foodPreference") === "vegetarian"} />
                               <label htmlFor="food-vegetarian" className="text-base font-medium cursor-pointer flex-1">
@@ -375,7 +394,10 @@ export default function PlanTrip() {
                               </label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "non-vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("foodPreference", "non-vegetarian")}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "non-vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("foodPreference", "non-vegetarian")}
+                          >
                             <div className="flex items-center gap-3">
                               <RadioGroupItem value="non-vegetarian" id="food-non-vegetarian" checked={methods.watch("foodPreference") === "non-vegetarian"} />
                               <label htmlFor="food-non-vegetarian" className="text-base font-medium cursor-pointer flex-1">
@@ -383,7 +405,10 @@ export default function PlanTrip() {
                               </label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegan" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("foodPreference", "vegan")}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegan" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("foodPreference", "vegan")}
+                          >
                             <div className="flex items-center gap-3">
                               <RadioGroupItem value="vegan" id="food-vegan" checked={methods.watch("foodPreference") === "vegan"} />
                               <label htmlFor="food-vegan" className="text-base font-medium cursor-pointer flex-1">
@@ -391,7 +416,10 @@ export default function PlanTrip() {
                               </label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "no-preference" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("foodPreference", "no-preference")}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "no-preference" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("foodPreference", "no-preference")}
+                          >
                             <div className="flex items-center gap-3">
                               <RadioGroupItem value="no-preference" id="food-no-preference" checked={methods.watch("foodPreference") === "no-preference"} />
                               <label htmlFor="food-no-preference" className="text-base font-medium cursor-pointer flex-1">
@@ -401,14 +429,15 @@ export default function PlanTrip() {
                           </Card>
                         </div>
                         
-                        <Card className={`p-4 cursor-pointer transition-all ${methods.watch("localFood") ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("localFood", !methods.watch("localFood"))}>
+                        {/* FIX: Remove the onClick handler from Card and handle the checkbox separately */}
+                        <Card className={`p-4 cursor-pointer transition-all ${methods.watch("localFood") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
                           <div className="flex items-center gap-3">
                             <Checkbox 
                               id="local-food" 
                               checked={methods.watch("localFood")}
                               onCheckedChange={(checked) => methods.setValue("localFood", !!checked)}
                             />
-                            <label htmlFor="local-food" className="text-base font-medium cursor-pointer flex-1">
+                            <label htmlFor="local-food" className="text-base font-medium cursor-pointer flex-1" onClick={() => methods.setValue("localFood", !methods.watch("localFood"))}>
                               Interested in local food
                             </label>
                           </div>
@@ -420,19 +449,28 @@ export default function PlanTrip() {
                       <div className="space-y-4">
                         <Label>Preferred mode of transportation?</Label>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "roadways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("transportationMode", "roadways")}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "roadways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("transportationMode", "roadways")}
+                          >
                             <div className="flex flex-col items-center gap-2 py-3">
                               <Car className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Roadways</label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "railways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("transportationMode", "railways")}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "railways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("transportationMode", "railways")}
+                          >
                             <div className="flex flex-col items-center gap-2 py-3">
                               <Train className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Railways</label>
                             </div>
                           </Card>
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "airways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} onClick={() => methods.setValue("transportationMode", "airways")}>
+                          <Card 
+                            className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "airways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            onClick={() => methods.setValue("transportationMode", "airways")}
+                          >
                             <div className="flex flex-col items-center gap-2 py-3">
                               <Plane className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Airways</label>
