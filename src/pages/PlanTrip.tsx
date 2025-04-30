@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -36,7 +36,12 @@ import {
   ChevronRight,
   MoveRight,
   Plus,
-  Minus
+  Minus,
+  MapPin,
+  Navigation,
+  User,
+  Mail,
+  Lock
 } from "lucide-react";
 import Map from "@/components/Map";
 
@@ -53,16 +58,30 @@ const allInterests = [
   { id: "photography", label: "Photography" },
   { id: "art", label: "Art" },
   { id: "wellness", label: "Wellness" },
-  { id: "sports", label: "Sports" }
+  { id: "sports", label: "Sports" },
+  { id: "architecture", label: "Architecture" },
+  { id: "technology", label: "Technology" },
+  { id: "education", label: "Education" },
+  { id: "science", label: "Science" },
+  { id: "wildlife", label: "Wildlife" },
+  { id: "diving", label: "Diving" },
+  { id: "hiking", label: "Hiking" },
+  { id: "camping", label: "Camping" }
 ];
 
 // Step titles and avatars for gamification
 const steps = [
   { 
-    title: "Where are you planning to go?",
-    subtitle: "Let's start your journey!",
+    title: "Create your account",
+    subtitle: "Start your journey with us",
+    icon: <User className="h-8 w-8 text-goginie-primary" />,
+    mascotTip: "Your account lets you save and access all your trips!"
+  },
+  { 
+    title: "Your trip details",
+    subtitle: "Plan your journey",
     icon: <Compass className="h-8 w-8 text-goginie-primary" />,
-    mascotTip: "Choose a destination you've always dreamed of visiting!"
+    mascotTip: "Tell us where you're starting from and where you want to go!"
   },
   { 
     title: "When are you traveling?",
@@ -109,6 +128,10 @@ export default function PlanTrip() {
   // Form state using react-hook-form
   const methods = useForm({
     defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      startLocation: "",
       destination: "",
       startDate: "",
       endDate: "",
@@ -125,6 +148,7 @@ export default function PlanTrip() {
   const [currentStep, setCurrentStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   
   // Progress calculation
   const progress = ((currentStep + 1) / steps.length) * 100;
@@ -178,7 +202,7 @@ export default function PlanTrip() {
       setTimeout(() => {
         toast({
           title: "Trip plan created!",
-          description: `Your trip to ${data.destination} is being prepared.`,
+          description: `Your trip from ${data.startLocation} to ${data.destination} is being prepared.`,
         });
         setIsLoading(false);
         setShowConfetti(false);
@@ -248,27 +272,111 @@ export default function PlanTrip() {
 
                     {/* Step content */}
                     {currentStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="fullName">Full Name</Label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              id="fullName" 
+                              placeholder="John Doe"
+                              className="pl-10" 
+                              {...methods.register("fullName", { required: true })}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              id="email"
+                              type="email"
+                              placeholder="you@example.com"
+                              className="pl-10" 
+                              {...methods.register("email", { required: true })}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="password">Password</Label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              id="password"
+                              type="password"
+                              placeholder="••••••••" 
+                              className="pl-10"
+                              {...methods.register("password", { required: true })}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Password must be at least 8 characters long
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="terms" 
+                            checked={agreedToTerms}
+                            onCheckedChange={(checked) => setAgreedToTerms(!!checked)}
+                            required
+                          />
+                          <label
+                            htmlFor="terms"
+                            className="text-sm font-medium cursor-pointer"
+                            onClick={() => setAgreedToTerms(!agreedToTerms)}
+                          >
+                            I agree to the Terms of Service and Privacy Policy
+                          </label>
+                        </div>
+                      </div>
+                    )}
+
+                    {currentStep === 1 && (
                       <div className="space-y-6">
                         <div className="space-y-2">
-                          <Label htmlFor="destination">Destination</Label>
-                          <Input 
-                            id="destination" 
-                            placeholder="City, Country" 
-                            {...methods.register("destination", { required: true })}
-                          />
+                          <Label htmlFor="startLocation">Your Current Location</Label>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              id="startLocation" 
+                              placeholder="City, Country" 
+                              className="pl-10"
+                              {...methods.register("startLocation", { required: true })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="destination">Where do you want to go?</Label>
+                          <div className="relative">
+                            <Navigation className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              id="destination" 
+                              placeholder="City, Country" 
+                              className="pl-10"
+                              {...methods.register("destination", { required: true })}
+                            />
+                          </div>
                         </div>
                         
                         {/* Map View */}
-                        {methods.watch("destination") && (
+                        {(methods.watch("startLocation") || methods.watch("destination")) && (
                           <div className="mt-6 space-y-2">
-                            <Label>Map Preview</Label>
-                            <Map destination={methods.watch("destination")} />
+                            <Label>Route Preview</Label>
+                            <Map 
+                              startLocation={methods.watch("startLocation")} 
+                              destination={methods.watch("destination")} 
+                            />
                           </div>
                         )}
                       </div>
                     )}
 
-                    {currentStep === 1 && (
+                    {currentStep === 2 && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="startDate">Start Date</Label>
@@ -289,7 +397,7 @@ export default function PlanTrip() {
                       </div>
                     )}
 
-                    {currentStep === 2 && (
+                    {currentStep === 3 && (
                       <div className="space-y-6">
                         <div className="space-y-2">
                           <div className="flex justify-between">
@@ -311,7 +419,7 @@ export default function PlanTrip() {
                       </div>
                     )}
 
-                    {currentStep === 3 && (
+                    {currentStep === 4 && (
                       <div className="space-y-4">
                         <Label>Select your interests</Label>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -344,7 +452,7 @@ export default function PlanTrip() {
                       </div>
                     )}
 
-                    {currentStep === 4 && (
+                    {currentStep === 5 && (
                       <div className="space-y-4">
                         <Label>How many people are traveling?</Label>
                         
@@ -417,7 +525,7 @@ export default function PlanTrip() {
                       </div>
                     )}
 
-                    {currentStep === 5 && (
+                    {currentStep === 6 && (
                       <div className="space-y-4">
                         <Label>What are your food preferences?</Label>
                         <RadioGroup 
@@ -490,7 +598,7 @@ export default function PlanTrip() {
                       </div>
                     )}
 
-                    {currentStep === 6 && (
+                    {currentStep === 7 && (
                       <div className="space-y-4">
                         <Label>Preferred mode of transportation?</Label>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -540,7 +648,7 @@ export default function PlanTrip() {
                       <Button
                         type="submit"
                         className="bg-goginie-primary hover:bg-goginie-secondary flex items-center gap-2"
-                        disabled={isLoading}
+                        disabled={isLoading || (currentStep === 0 && !agreedToTerms)}
                       >
                         {isLoading ? (
                           "Creating your trip plan..."
@@ -568,10 +676,26 @@ export default function PlanTrip() {
               </div>
               
               <div className="space-y-3 text-sm">
+                {methods.watch("fullName") && (
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-goginie-primary shrink-0" />
+                    <span className="font-medium">Name:</span>
+                    <span className="ml-1">{methods.watch("fullName")}</span>
+                  </div>
+                )}
+                
+                {methods.watch("startLocation") && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-goginie-primary shrink-0" />
+                    <span className="font-medium">From:</span>
+                    <span className="ml-1">{methods.watch("startLocation")}</span>
+                  </div>
+                )}
+                
                 {methods.watch("destination") && (
                   <div className="flex items-center gap-2">
-                    <MapIcon className="h-4 w-4 text-goginie-primary shrink-0" />
-                    <span className="font-medium">Destination:</span>
+                    <Navigation className="h-4 w-4 text-goginie-primary shrink-0" />
+                    <span className="font-medium">To:</span>
                     <span className="ml-1">{methods.watch("destination")}</span>
                   </div>
                 )}
@@ -661,11 +785,13 @@ export default function PlanTrip() {
                   <div className="text-sm">
                     <p className="font-medium">GoGinie says:</p>
                     <p className="text-muted-foreground">
-                      {!methods.watch("destination") ? "Where would you like to travel?" :
+                      {!methods.watch("fullName") ? "Let's start by creating your account!" :
+                       !methods.watch("startLocation") ? "Where are you starting your journey from?" :
+                       !methods.watch("destination") ? "Where would you like to travel to?" :
                        !methods.watch("startDate") ? "When are you planning to visit " + methods.watch("destination") + "?" :
                        !methods.watch("budget") ? "What's your budget for this trip?" :
                        !methods.watch("interests") || methods.watch("interests").length === 0 ? "What are you interested in exploring?" :
-                       `I'm preparing a magical journey to ${methods.watch("destination")} for you!`}
+                       `I'm preparing a magical journey from ${methods.watch("startLocation")} to ${methods.watch("destination")} for you!`}
                     </p>
                   </div>
                 </div>

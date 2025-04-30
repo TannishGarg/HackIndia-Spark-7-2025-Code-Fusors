@@ -1,17 +1,18 @@
-
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapProps {
+  startLocation?: string;
   destination?: string;
   className?: string;
 }
 
-const Map = ({ destination, className }: MapProps) => {
+const Map = ({ startLocation, destination, className }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>("");
+  const [coordinates, setCoordinates] = useState<{ start?: [number, number]; end?: [number, number] }>({});
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;
@@ -34,36 +35,102 @@ const Map = ({ destination, className }: MapProps) => {
     };
   }, [mapboxToken]);
 
-  // Search for the destination and update the map when it changes
+  // Search for the locations and update the map when they change
   useEffect(() => {
-    if (!map.current || !destination || !mapboxToken) return;
+    if (!map.current || (!startLocation && !destination) || !mapboxToken) return;
 
-    // Use Mapbox Geocoding API to find the coordinates for the destination
-    fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        destination
-      )}.json?access_token=${mapboxToken}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.features && data.features.length > 0) {
-          const [lng, lat] = data.features[0].center;
+    const fetchLocations = async () => {
+      const newCoordinates = { ...coordinates };
+      
+      // Fetch start location coordinates if provided
+      if (startLocation && (!coordinates.start || startLocation !== coordinates.start.toString())) {
+        try {
+          const response = await fetch(
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+              startLocation
+            )}.json?access_token=${mapboxToken}`
+          );
+          const data = await response.json();
           
-          map.current?.flyTo({
-            center: [lng, lat],
-            zoom: 8,
-            essential: true,
-          });
-
-          // Add a marker for the destination
-          new mapboxgl.Marker({ color: "#FF4B4B" })
-            .setLngLat([lng, lat])
-            .setPopup(new mapboxgl.Popup().setHTML(`<h3>${destination}</h3>`))
-            .addTo(map.current);
+          if (data.features && data.features.length > 0) {
+            newCoordinates.start = data.features[0].center as [number, number];
+          }
+        } catch (error) {
+          console.error("Error fetching start coordinates:", error);
         }
-      })
-      .catch((error) => console.error("Error fetching destination coordinates:", error));
-  }, [destination, mapboxToken]);
+      }
+      
+      // Fetch destination coordinates if provided
+      if (destination && (!coordinates.end || destination !== coordinates.end.toString())) {
+        try {
+          const response = await fetch(
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+              destination
+            )}.json?access_token=${mapboxToken}`
+          );
+          const data = await response.json();
+          
+          if (data.features && data.features.length > 0) {
+            newCoordinates.end = data.features[0].center as [number, number];
+          }
+        } catch (error) {
+          console.error("Error fetching destination coordinates:", error);
+        }
+      }
+      
+      setCoordinates(newCoordinates);
+    };
+    
+    fetchLocations();
+  }, [startLocation, destination, mapboxToken]);
+  
+  // Draw route or update markers when coordinates change
+  useEffect(() => {
+    if (!map.current) return;
+    
+    // Clear previous markers
+    const markers = document.querySelectorAll('.mapboxgl-marker');
+    markers.forEach(marker => marker.remove());
+    
+    // Add markers and fly to appropriate view
+    if (coordinates.start) {
+      new mapboxgl.Marker({ color: "#3FB1CE" })
+        .setLngLat(coordinates.start)
+        .setPopup(new mapboxgl.Popup().setHTML(`<h3>Start: ${startLocation}</h3>`))
+        .addTo(map.current);
+    }
+    
+    if (coordinates.end) {
+      new mapboxgl.Marker({ color: "#FF4B4B" })
+        .setLngLat(coordinates.end)
+        .setPopup(new mapboxgl.Popup().setHTML(`<h3>Destination: ${destination}</h3>`))
+        .addTo(map.current);
+    }
+    
+    // If we have both points, fit the map to show both
+    if (coordinates.start && coordinates.end) {
+      const bounds = new mapboxgl.LngLatBounds()
+        .extend(coordinates.start)
+        .extend(coordinates.end);
+      
+      map.current.fitBounds(bounds, {
+        padding: 100,
+        maxZoom: 12,
+        duration: 1000
+      });
+    } 
+    // Otherwise zoom to whichever point we have
+    else if (coordinates.start || coordinates.end) {
+      const point = coordinates.start || coordinates.end;
+      if (point) {
+        map.current.flyTo({
+          center: point,
+          zoom: 8,
+          duration: 1000
+        });
+      }
+    }
+  }, [coordinates, startLocation, destination]);
 
   return (
     <div className="flex flex-col">
