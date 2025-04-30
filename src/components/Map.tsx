@@ -1,6 +1,8 @@
+
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+// We're importing leaflet-routing-machine now that it's installed
 import "leaflet-routing-machine";
 import axios from "axios";
 
