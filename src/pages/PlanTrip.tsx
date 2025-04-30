@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { 
-  Map, 
+  Map as MapIcon, 
   CalendarRange, 
   Coins, 
   Compass, 
@@ -33,8 +34,27 @@ import {
   Sparkles,
   Hotel,
   ChevronRight,
-  MoveRight
+  MoveRight,
+  Plus,
+  Minus
 } from "lucide-react";
+import Map from "@/components/Map";
+
+// List of all available interests
+const allInterests = [
+  { id: "adventure", label: "Adventure" },
+  { id: "culture", label: "Culture" },
+  { id: "foodie", label: "Foodie" },
+  { id: "relaxation", label: "Relaxation" },
+  { id: "history", label: "History" },
+  { id: "nature", label: "Nature" },
+  { id: "shopping", label: "Shopping" },
+  { id: "nightlife", label: "Nightlife" },
+  { id: "photography", label: "Photography" },
+  { id: "art", label: "Art" },
+  { id: "wellness", label: "Wellness" },
+  { id: "sports", label: "Sports" }
+];
 
 // Step titles and avatars for gamification
 const steps = [
@@ -94,7 +114,7 @@ export default function PlanTrip() {
       endDate: "",
       budget: 50000,
       interests: [],
-      travelGroupSize: 1,
+      travelGroupSize: 2,
       foodPreference: "",
       localFood: false,
       transportationMode: "airways"
@@ -130,6 +150,19 @@ export default function PlanTrip() {
       );
     } else {
       methods.setValue("interests", [...currentInterests, interest]);
+    }
+  };
+
+  // Handle traveler count changes
+  const incrementTravelers = () => {
+    const currentValue = methods.getValues("travelGroupSize") || 1;
+    methods.setValue("travelGroupSize", currentValue + 1);
+  };
+
+  const decrementTravelers = () => {
+    const currentValue = methods.getValues("travelGroupSize") || 2;
+    if (currentValue > 1) {
+      methods.setValue("travelGroupSize", currentValue - 1);
     }
   };
   
@@ -215,7 +248,7 @@ export default function PlanTrip() {
 
                     {/* Step content */}
                     {currentStep === 0 && (
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         <div className="space-y-2">
                           <Label htmlFor="destination">Destination</Label>
                           <Input 
@@ -224,6 +257,14 @@ export default function PlanTrip() {
                             {...methods.register("destination", { required: true })}
                           />
                         </div>
+                        
+                        {/* Map View */}
+                        {methods.watch("destination") && (
+                          <div className="mt-6 space-y-2">
+                            <Label>Map Preview</Label>
+                            <Map destination={methods.watch("destination")} />
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -273,59 +314,32 @@ export default function PlanTrip() {
                     {currentStep === 3 && (
                       <div className="space-y-4">
                         <Label>Select your interests</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-                          {/* FIX: Remove the onClick handler from Card and use separate handler */}
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("adventure") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
-                            <div className="flex items-center gap-3">
-                              <Checkbox 
-                                id="interest-adventure" 
-                                checked={methods.watch("interests")?.includes("adventure")}
-                                onCheckedChange={() => handleInterestChange("adventure")}
-                              />
-                              <label htmlFor="interest-adventure" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("adventure")}>
-                                Adventure
-                              </label>
-                            </div>
-                          </Card>
-                          
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("culture") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
-                            <div className="flex items-center gap-3">
-                              <Checkbox 
-                                id="interest-culture" 
-                                checked={methods.watch("interests")?.includes("culture")}
-                                onCheckedChange={() => handleInterestChange("culture")}
-                              />
-                              <label htmlFor="interest-culture" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("culture")}>
-                                Culture
-                              </label>
-                            </div>
-                          </Card>
-                          
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("foodie") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
-                            <div className="flex items-center gap-3">
-                              <Checkbox 
-                                id="interest-foodie" 
-                                checked={methods.watch("interests")?.includes("foodie")}
-                                onCheckedChange={() => handleInterestChange("foodie")}
-                              />
-                              <label htmlFor="interest-foodie" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("foodie")}>
-                                Foodie
-                              </label>
-                            </div>
-                          </Card>
-                          
-                          <Card className={`p-4 cursor-pointer transition-all ${methods.watch("interests")?.includes("relaxation") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
-                            <div className="flex items-center gap-3">
-                              <Checkbox 
-                                id="interest-relaxation" 
-                                checked={methods.watch("interests")?.includes("relaxation")}
-                                onCheckedChange={() => handleInterestChange("relaxation")}
-                              />
-                              <label htmlFor="interest-relaxation" className="text-base font-medium cursor-pointer flex-1" onClick={() => handleInterestChange("relaxation")}>
-                                Relaxation
-                              </label>
-                            </div>
-                          </Card>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {allInterests.map((interest) => (
+                            <Card 
+                              key={interest.id}
+                              className={`p-3 cursor-pointer transition-all ${
+                                methods.watch("interests")?.includes(interest.id) 
+                                  ? "border-goginie-primary bg-goginie-primary/10" 
+                                  : ""
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Checkbox 
+                                  id={`interest-${interest.id}`}
+                                  checked={methods.watch("interests")?.includes(interest.id)}
+                                  onCheckedChange={() => handleInterestChange(interest.id)}
+                                />
+                                <label 
+                                  htmlFor={`interest-${interest.id}`} 
+                                  className="text-sm font-medium cursor-pointer flex-1"
+                                  onClick={() => handleInterestChange(interest.id)}
+                                >
+                                  {interest.label}
+                                </label>
+                              </div>
+                            </Card>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -333,47 +347,72 @@ export default function PlanTrip() {
                     {currentStep === 4 && (
                       <div className="space-y-4">
                         <Label>How many people are traveling?</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 1 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                        
+                        {/* Numeric traveler selector */}
+                        <div className="flex items-center justify-center gap-4 my-6">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={decrementTravelers}
+                            disabled={methods.watch("travelGroupSize") <= 1}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          
+                          <div className="flex flex-col items-center">
+                            <div className="text-4xl font-bold text-goginie-primary">
+                              {methods.watch("travelGroupSize")}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {methods.watch("travelGroupSize") === 1 ? "Person" : "People"}
+                            </div>
+                          </div>
+                          
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={incrementTravelers}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        {/* Group size suggestions */}
+                        <div className="grid grid-cols-4 gap-3 mt-4">
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            className={methods.watch("travelGroupSize") === 1 ? "border-goginie-primary bg-goginie-primary/10" : ""}
                             onClick={() => methods.setValue("travelGroupSize", 1)}
                           >
-                            <div className="flex flex-col items-center gap-2 py-2">
-                              <Users className="h-8 w-8 text-goginie-primary" />
-                              <label className="text-base font-medium cursor-pointer">Solo</label>
-                              <span className="text-sm text-muted-foreground">1 Person</span>
-                            </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 2 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            Solo
+                          </Button>
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            className={methods.watch("travelGroupSize") === 2 ? "border-goginie-primary bg-goginie-primary/10" : ""}
                             onClick={() => methods.setValue("travelGroupSize", 2)}
                           >
-                            <div className="flex flex-col items-center gap-2 py-2">
-                              <Users className="h-8 w-8 text-goginie-primary" />
-                              <label className="text-base font-medium cursor-pointer">Couple</label>
-                              <span className="text-sm text-muted-foreground">2 People</span>
-                            </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 4 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            Couple
+                          </Button>
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            className={methods.watch("travelGroupSize") === 4 ? "border-goginie-primary bg-goginie-primary/10" : ""}
                             onClick={() => methods.setValue("travelGroupSize", 4)}
                           >
-                            <div className="flex flex-col items-center gap-2 py-2">
-                              <Users className="h-8 w-8 text-goginie-primary" />
-                              <label className="text-base font-medium cursor-pointer">Family</label>
-                              <span className="text-sm text-muted-foreground">4 People</span>
-                            </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("travelGroupSize") === 6 ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            Family
+                          </Button>
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            className={methods.watch("travelGroupSize") === 6 ? "border-goginie-primary bg-goginie-primary/10" : ""}
                             onClick={() => methods.setValue("travelGroupSize", 6)}
                           >
-                            <div className="flex flex-col items-center gap-2 py-2">
-                              <Users className="h-8 w-8 text-goginie-primary" />
-                              <label className="text-base font-medium cursor-pointer">Friends</label>
-                              <span className="text-sm text-muted-foreground">6 People</span>
-                            </div>
-                          </Card>
+                            Group
+                          </Button>
                         </div>
                       </div>
                     )}
@@ -385,9 +424,9 @@ export default function PlanTrip() {
                           value={methods.watch("foodPreference") || ""} 
                           onValueChange={(value) => methods.setValue("foodPreference", value)}
                         >
-                          <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-4">
-                            <Card 
-                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div 
+                              className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("foodPreference") === "vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
                               onClick={() => methods.setValue("foodPreference", "vegetarian")}
                             >
                               <div className="flex items-center gap-3">
@@ -396,9 +435,10 @@ export default function PlanTrip() {
                                   Vegetarian
                                 </label>
                               </div>
-                            </Card>
-                            <Card 
-                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "non-vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            </div>
+                            
+                            <div 
+                              className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("foodPreference") === "non-vegetarian" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
                               onClick={() => methods.setValue("foodPreference", "non-vegetarian")}
                             >
                               <div className="flex items-center gap-3">
@@ -407,9 +447,10 @@ export default function PlanTrip() {
                                   Non-Vegetarian
                                 </label>
                               </div>
-                            </Card>
-                            <Card 
-                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "vegan" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            </div>
+                            
+                            <div 
+                              className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("foodPreference") === "vegan" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
                               onClick={() => methods.setValue("foodPreference", "vegan")}
                             >
                               <div className="flex items-center gap-3">
@@ -418,9 +459,10 @@ export default function PlanTrip() {
                                   Vegan
                                 </label>
                               </div>
-                            </Card>
-                            <Card 
-                              className={`p-4 cursor-pointer transition-all ${methods.watch("foodPreference") === "no-preference" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                            </div>
+                            
+                            <div 
+                              className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("foodPreference") === "no-preference" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
                               onClick={() => methods.setValue("foodPreference", "no-preference")}
                             >
                               <div className="flex items-center gap-3">
@@ -429,11 +471,11 @@ export default function PlanTrip() {
                                   No Preference
                                 </label>
                               </div>
-                            </Card>
+                            </div>
                           </div>
                         </RadioGroup>
                         
-                        <Card className={`p-4 cursor-pointer transition-all ${methods.watch("localFood") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
+                        <div className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("localFood") ? "border-goginie-primary bg-goginie-primary/10" : ""}`}>
                           <div className="flex items-center gap-3">
                             <Checkbox 
                               id="local-food" 
@@ -444,7 +486,7 @@ export default function PlanTrip() {
                               Interested in local food
                             </label>
                           </div>
-                        </Card>
+                        </div>
                       </div>
                     )}
 
@@ -452,33 +494,35 @@ export default function PlanTrip() {
                       <div className="space-y-4">
                         <Label>Preferred mode of transportation?</Label>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "roadways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                          <div 
+                            className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("transportationMode") === "roadways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
                             onClick={() => methods.setValue("transportationMode", "roadways")}
                           >
                             <div className="flex flex-col items-center gap-2 py-3">
                               <Car className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Roadways</label>
                             </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "railways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                          </div>
+                          
+                          <div 
+                            className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("transportationMode") === "railways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
                             onClick={() => methods.setValue("transportationMode", "railways")}
                           >
                             <div className="flex flex-col items-center gap-2 py-3">
                               <Train className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Railways</label>
                             </div>
-                          </Card>
-                          <Card 
-                            className={`p-4 cursor-pointer transition-all ${methods.watch("transportationMode") === "airways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
+                          </div>
+                          
+                          <div 
+                            className={`p-4 cursor-pointer transition-all rounded-md border ${methods.watch("transportationMode") === "airways" ? "border-goginie-primary bg-goginie-primary/10" : ""}`} 
                             onClick={() => methods.setValue("transportationMode", "airways")}
                           >
                             <div className="flex flex-col items-center gap-2 py-3">
                               <Plane className="h-8 w-8 text-goginie-primary" />
                               <label className="text-base font-medium cursor-pointer">Airways</label>
                             </div>
-                          </Card>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -526,7 +570,7 @@ export default function PlanTrip() {
               <div className="space-y-3 text-sm">
                 {methods.watch("destination") && (
                   <div className="flex items-center gap-2">
-                    <Map className="h-4 w-4 text-goginie-primary shrink-0" />
+                    <MapIcon className="h-4 w-4 text-goginie-primary shrink-0" />
                     <span className="font-medium">Destination:</span>
                     <span className="ml-1">{methods.watch("destination")}</span>
                   </div>
@@ -594,11 +638,14 @@ export default function PlanTrip() {
                     <div>
                       <span className="font-medium">Interests:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {methods.watch("interests").map((interest: string) => (
-                          <span key={interest} className="px-2 py-0.5 bg-goginie-primary/10 text-xs rounded-full">
-                            {interest.charAt(0).toUpperCase() + interest.slice(1)}
-                          </span>
-                        ))}
+                        {methods.watch("interests").map((interest: string) => {
+                          const interestObj = allInterests.find(i => i.id === interest);
+                          return (
+                            <span key={interest} className="px-2 py-0.5 bg-goginie-primary/10 text-xs rounded-full">
+                              {interestObj ? interestObj.label : interest.charAt(0).toUpperCase() + interest.slice(1)}
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
