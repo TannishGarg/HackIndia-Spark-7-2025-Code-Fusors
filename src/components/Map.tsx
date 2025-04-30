@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -118,6 +119,62 @@ const Map = ({ startLocation, destination, className }: MapProps) => {
         maxZoom: 12,
         duration: 1000
       });
+      
+      // Attempt to draw a route if we have both points
+      if (mapboxToken) {
+        const drawRoute = async () => {
+          try {
+            const query = await fetch(
+              `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates.start[0]},${coordinates.start[1]};${coordinates.end[0]},${coordinates.end[1]}?steps=true&geometries=geojson&access_token=${mapboxToken}`,
+              { method: 'GET' }
+            );
+            const json = await query.json();
+            
+            if (json.routes && json.routes[0]) {
+              const route = json.routes[0];
+              const routeGeoJSON = {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: route.geometry.coordinates
+                }
+              };
+              
+              // Check if the route layer exists
+              if (map.current.getSource('route')) {
+                // Update existing source
+                (map.current.getSource('route') as mapboxgl.GeoJSONSource).setData(routeGeoJSON as any);
+              } else {
+                // Add new source and layer
+                map.current.addSource('route', {
+                  type: 'geojson',
+                  data: routeGeoJSON as any
+                });
+                
+                map.current.addLayer({
+                  id: 'route',
+                  type: 'line',
+                  source: 'route',
+                  layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                  },
+                  paint: {
+                    'line-color': '#3887be',
+                    'line-width': 5,
+                    'line-opacity': 0.75
+                  }
+                });
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching route:", error);
+          }
+        };
+        
+        drawRoute();
+      }
     } 
     // Otherwise zoom to whichever point we have
     else if (coordinates.start || coordinates.end) {
@@ -130,7 +187,7 @@ const Map = ({ startLocation, destination, className }: MapProps) => {
         });
       }
     }
-  }, [coordinates, startLocation, destination]);
+  }, [coordinates, startLocation, destination, mapboxToken]);
 
   return (
     <div className="flex flex-col">

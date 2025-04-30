@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Compass, Mail, Lock, ArrowRight } from "lucide-react";
+import { Compass, Mail, Lock, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -36,10 +36,14 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-goginie-soft-purple to-white p-4">
       <div className="w-full max-w-md animate-fade-in">
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-center relative">
           <Link to="/" className="inline-flex items-center justify-center gap-2">
             <Compass size={36} className="text-goginie-primary" strokeWidth={2} />
             <span className="text-2xl font-bold text-goginie-dark">GoGinie</span>
+          </Link>
+          <Link to="/" className="absolute left-0 top-2 flex items-center gap-1 text-goginie-primary hover:underline">
+            <ArrowLeft size={16} />
+            <span>Back to Home</span>
           </Link>
         </div>
 

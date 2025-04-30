@@ -12,7 +12,13 @@ export default function Navbar() {
   // In a real app, we'd check authentication status from a context or auth provider
   useEffect(() => {
     // For demo purposes, we'll just set this to false
-    setIsAuthenticated(false);
+    const hasUserVisited = localStorage.getItem('userHasVisited');
+    setIsAuthenticated(Boolean(hasUserVisited));
+    
+    // Mark that user has visited the site
+    if (!hasUserVisited) {
+      localStorage.setItem('userHasVisited', 'true');
+    }
   }, []);
 
   return (

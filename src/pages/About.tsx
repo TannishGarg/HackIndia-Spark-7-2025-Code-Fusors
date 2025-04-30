@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,42 @@ export default function About() {
       name: "Rahul Gupta",
       role: "Lead Developer",
       image: "https://picsum.photos/200/200?random=3"
+    }
+  ];
+
+  // Add reviews data
+  const reviews = [
+    {
+      name: "Maria López",
+      location: "Madrid, Spain",
+      rating: 5,
+      comment: "GoGinie transformed our family trip to Japan! The AI recommendations were spot on and saved us hours of planning time.",
+      image: "https://randomuser.me/api/portraits/women/22.jpg",
+      date: "March 15, 2025"
+    },
+    {
+      name: "John Davis",
+      location: "Melbourne, Australia",
+      rating: 4,
+      comment: "The personalized itinerary for my solo trip to Europe was incredible. I discovered hidden gems I would have never found on my own.",
+      image: "https://randomuser.me/api/portraits/men/45.jpg",
+      date: "February 8, 2025"
+    },
+    {
+      name: "Aisha Khan",
+      location: "Dubai, UAE",
+      rating: 5,
+      comment: "I've used many travel planning apps before, but GoGinie's AI recommendations truly understand my preferences. Our honeymoon in Bali was perfect!",
+      image: "https://randomuser.me/api/portraits/women/65.jpg",
+      date: "April 3, 2025"
+    },
+    {
+      name: "Carlos Mendoza",
+      location: "Mexico City, Mexico",
+      rating: 5,
+      comment: "The restaurant recommendations were outstanding! As a foodie, I appreciated discovering authentic local cuisines that matched my dietary preferences.",
+      image: "https://randomuser.me/api/portraits/men/32.jpg", 
+      date: "January 27, 2025"
     }
   ];
 
@@ -233,6 +269,57 @@ export default function About() {
               </div>
               <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
               <p className="text-muted-foreground mb-3">{member.role}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+      
+      {/* Reviews Section */}
+      <section className="mb-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold mb-4">What Our Travelers Say</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Real experiences from travelers who have used GoGinie to plan their adventures
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {reviews.map((review, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * index }}
+            >
+              <Card className="h-full">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="h-12 w-12 rounded-full overflow-hidden flex-shrink-0">
+                      <img 
+                        src={review.image} 
+                        alt={review.name} 
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-grow">
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="font-semibold">{review.name}</h4>
+                        <span className="text-sm text-muted-foreground">{review.date}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">{review.location}</p>
+                      <div className="flex items-center mb-3">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`h-4 w-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-muted-foreground">{review.comment}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>
