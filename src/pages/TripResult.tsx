@@ -530,7 +530,7 @@ export default function TripResult() {
                         <p><span className="font-medium">Transit Pass:</span> {
                           tripData.transportation.localTransportation.metroPass && 
                           (tripData.transportation.localTransportation.metroPass.includes("$") 
-                            ? `₹${convertToINR(parseInt(tripData.transportation.localTransportation.metroPass.replace(/[^\d]/g, '')))}`
+                            ? `₹${convertToINR(parseInt(tripData.transportation.localTransportation.metroPass.replace(/[^\\d]/g, '')))}`
                             : tripData.transportation.localTransportation.metroPass)
                         }</p>
                         <p className="mt-2 text-sm">All options: {tripData.transportation.localTransportation.options.join(", ")}</p>
@@ -691,4 +691,4 @@ const WeatherIcon = ({ condition }: { condition: string }) => {
     case "sunny":
       return <Sun className="h-5 w-5 text-yellow-500" />;
     case "partly-cloudy":
-      return <CloudSun className="h-5 w-5
+      return <CloudSun className="h-
