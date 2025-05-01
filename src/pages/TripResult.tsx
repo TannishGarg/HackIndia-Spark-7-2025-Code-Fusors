@@ -691,4 +691,4 @@ const WeatherIcon = ({ condition }: { condition: string }) => {
     case "sunny":
       return <Sun className="h-5 w-5 text-yellow-500" />;
     case "partly-cloudy":
-      return <CloudSun className="h-
+      return <CloudSun className="h-5 w-
