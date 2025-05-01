@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -69,6 +68,223 @@ const allInterests = [
   { id: "camping", label: "Camping" }
 ];
 
+// List of popular cities with details
+const popularCities = [
+  // Major Metro Cities (Tier 1)
+  { name: "Mumbai, India", country: "India", code: "IN", description: "Financial capital of India, home to Bollywood" },
+  { name: "Delhi, India", country: "India", code: "IN", description: "Capital city with rich history and modern charm" },
+  { name: "Bangalore, India", country: "India", code: "IN", description: "Silicon Valley of India, garden city" },
+  { name: "Hyderabad, India", country: "India", code: "IN", description: "City of Pearls and tech hub" },
+  { name: "Chennai, India", country: "India", code: "IN", description: "Gateway to South India, cultural capital" },
+  { name: "Kolkata, India", country: "India", code: "IN", description: "City of Joy, cultural and intellectual hub" },
+  { name: "Pune, India", country: "India", code: "IN", description: "Oxford of the East, cultural capital of Maharashtra" },
+  { name: "Ahmedabad, India", country: "India", code: "IN", description: "First UNESCO World Heritage City in India" },
+
+  // North India Region
+  // Delhi-NCR
+  { name: "New Delhi, India", country: "India", code: "IN", description: "National capital, heart of India" },
+  { name: "Gurgaon, India", country: "India", code: "IN", description: "Millennium City, corporate hub" },
+  { name: "Noida, India", country: "India", code: "IN", description: "IT and industrial hub" },
+  { name: "Faridabad, India", country: "India", code: "IN", description: "Industrial city in NCR" },
+  { name: "Ghaziabad, India", country: "India", code: "IN", description: "Gateway to UP in NCR" },
+
+  // Uttar Pradesh
+  { name: "Lucknow, India", country: "India", code: "IN", description: "City of Nawabs and kebabs" },
+  { name: "Kanpur, India", country: "India", code: "IN", description: "Manchester of the East" },
+  { name: "Varanasi, India", country: "India", code: "IN", description: "Spiritual capital of India" },
+  { name: "Agra, India", country: "India", code: "IN", description: "City of Taj Mahal" },
+  { name: "Prayagraj, India", country: "India", code: "IN", description: "Sangam city" },
+  { name: "Gorakhpur, India", country: "India", code: "IN", description: "Gateway to Nepal" },
+  { name: "Meerut, India", country: "India", code: "IN", description: "Sports goods hub" },
+  { name: "Bareilly, India", country: "India", code: "IN", description: "Jhumka city" },
+  { name: "Aligarh, India", country: "India", code: "IN", description: "City of locks" },
+  { name: "Moradabad, India", country: "India", code: "IN", description: "Brass city" },
+
+  // Punjab
+  { name: "Chandigarh, India", country: "India", code: "IN", description: "The City Beautiful" },
+  { name: "Amritsar, India", country: "India", code: "IN", description: "Golden Temple city" },
+  { name: "Ludhiana, India", country: "India", code: "IN", description: "Manchester of India" },
+  { name: "Jalandhar, India", country: "India", code: "IN", description: "Sports industry hub" },
+  { name: "Patiala, India", country: "India", code: "IN", description: "Royal city of Punjab" },
+  { name: "Bathinda, India", country: "India", code: "IN", description: "City of lakes" },
+  { name: "Mohali, India", country: "India", code: "IN", description: "IT hub of Punjab" },
+
+  // Haryana
+  { name: "Gurgaon, India", country: "India", code: "IN", description: "Cyber city" },
+  { name: "Faridabad, India", country: "India", code: "IN", description: "Industrial hub" },
+  { name: "Panipat, India", country: "India", code: "IN", description: "City of weavers" },
+  { name: "Ambala, India", country: "India", code: "IN", description: "Gateway to Haryana" },
+  { name: "Hisar, India", country: "India", code: "IN", description: "Steel city" },
+  { name: "Karnal, India", country: "India", code: "IN", description: "Rice bowl of India" },
+
+  // Rajasthan
+  { name: "Jaipur, India", country: "India", code: "IN", description: "Pink City" },
+  { name: "Jodhpur, India", country: "India", code: "IN", description: "Blue City" },
+  { name: "Udaipur, India", country: "India", code: "IN", description: "City of Lakes" },
+  { name: "Ajmer, India", country: "India", code: "IN", description: "Pilgrimage city" },
+  { name: "Kota, India", country: "India", code: "IN", description: "Education city" },
+  { name: "Bikaner, India", country: "India", code: "IN", description: "Camel country" },
+  { name: "Jaisalmer, India", country: "India", code: "IN", description: "Golden City" },
+  { name: "Pushkar, India", country: "India", code: "IN", description: "Sacred lake city" },
+  { name: "Mount Abu, India", country: "India", code: "IN", description: "Hill station" },
+  { name: "Bharatpur, India", country: "India", code: "IN", description: "Bird sanctuary city" },
+
+  // South India Region
+  // Karnataka
+  { name: "Bangalore, India", country: "India", code: "IN", description: "Garden City" },
+  { name: "Mysore, India", country: "India", code: "IN", description: "City of Palaces" },
+  { name: "Mangalore, India", country: "India", code: "IN", description: "Port City" },
+  { name: "Hubli-Dharwad, India", country: "India", code: "IN", description: "Twin cities" },
+  { name: "Belgaum, India", country: "India", code: "IN", description: "Sugar bowl of Karnataka" },
+  { name: "Gulbarga, India", country: "India", code: "IN", description: "City of domes" },
+  { name: "Hampi, India", country: "India", code: "IN", description: "UNESCO heritage site" },
+  { name: "Coorg, India", country: "India", code: "IN", description: "Scotland of India" },
+
+  // Tamil Nadu
+  { name: "Chennai, India", country: "India", code: "IN", description: "Detroit of India" },
+  { name: "Coimbatore, India", country: "India", code: "IN", description: "Manchester of South India" },
+  { name: "Madurai, India", country: "India", code: "IN", description: "Temple City" },
+  { name: "Salem, India", country: "India", code: "IN", description: "Steel City" },
+  { name: "Tiruchirapalli, India", country: "India", code: "IN", description: "Rock Fort City" },
+  { name: "Tirunelveli, India", country: "India", code: "IN", description: "City of halwa" },
+  { name: "Vellore, India", country: "India", code: "IN", description: "Leather city" },
+  { name: "Thanjavur, India", country: "India", code: "IN", description: "Rice bowl of Tamil Nadu" },
+
+  // Kerala
+  { name: "Thiruvananthapuram, India", country: "India", code: "IN", description: "Evergreen city" },
+  { name: "Kochi, India", country: "India", code: "IN", description: "Queen of Arabian Sea" },
+  { name: "Kozhikode, India", country: "India", code: "IN", description: "City of spices" },
+  { name: "Thrissur, India", country: "India", code: "IN", description: "Cultural capital" },
+  { name: "Kollam, India", country: "India", code: "IN", description: "Cashew capital" },
+  { name: "Alappuzha, India", country: "India", code: "IN", description: "Venice of the East" },
+  { name: "Munnar, India", country: "India", code: "IN", description: "Tea garden hill station" },
+  { name: "Wayanad, India", country: "India", code: "IN", description: "Green paradise" },
+
+  // Andhra Pradesh & Telangana
+  { name: "Hyderabad, India", country: "India", code: "IN", description: "City of Pearls" },
+  { name: "Visakhapatnam, India", country: "India", code: "IN", description: "Port city" },
+  { name: "Vijayawada, India", country: "India", code: "IN", description: "Business hub" },
+  { name: "Warangal, India", country: "India", code: "IN", description: "Temple town" },
+  { name: "Tirupati, India", country: "India", code: "IN", description: "Temple city" },
+  { name: "Guntur, India", country: "India", code: "IN", description: "Chilli city" },
+  { name: "Nellore, India", country: "India", code: "IN", description: "Rice city" },
+  { name: "Kurnool, India", country: "India", code: "IN", description: "Gateway to Rayalaseema" },
+
+  // East India Region
+  // West Bengal
+  { name: "Kolkata, India", country: "India", code: "IN", description: "City of Joy" },
+  { name: "Howrah, India", country: "India", code: "IN", description: "Sheffield of India" },
+  { name: "Durgapur, India", country: "India", code: "IN", description: "Steel city" },
+  { name: "Siliguri, India", country: "India", code: "IN", description: "Gateway to Northeast" },
+  { name: "Asansol, India", country: "India", code: "IN", description: "Coal city" },
+  { name: "Darjeeling, India", country: "India", code: "IN", description: "Queen of Hills" },
+  { name: "Kharagpur, India", country: "India", code: "IN", description: "IIT city" },
+  { name: "Haldia, India", country: "India", code: "IN", description: "Port city" },
+
+  // Bihar
+  { name: "Patna, India", country: "India", code: "IN", description: "Ancient city" },
+  { name: "Gaya, India", country: "India", code: "IN", description: "Buddhist pilgrimage" },
+  { name: "Muzaffarpur, India", country: "India", code: "IN", description: "Lichi city" },
+  { name: "Bhagalpur, India", country: "India", code: "IN", description: "Silk city" },
+  { name: "Darbhanga, India", country: "India", code: "IN", description: "Cultural capital" },
+  { name: "Nalanda, India", country: "India", code: "IN", description: "Ancient university" },
+  { name: "Purnia, India", country: "India", code: "IN", description: "Agricultural hub" },
+  { name: "Ara, India", country: "India", code: "IN", description: "Historical city" },
+
+  // Odisha
+  { name: "Bhubaneswar, India", country: "India", code: "IN", description: "Temple city" },
+  { name: "Cuttack, India", country: "India", code: "IN", description: "Silver city" },
+  { name: "Rourkela, India", country: "India", code: "IN", description: "Steel city" },
+  { name: "Sambalpur, India", country: "India", code: "IN", description: "Textile city" },
+  { name: "Puri, India", country: "India", code: "IN", description: "Temple town" },
+  { name: "Berhampur, India", country: "India", code: "IN", description: "Silk city" },
+  { name: "Balasore, India", country: "India", code: "IN", description: "Missile city" },
+  { name: "Konark, India", country: "India", code: "IN", description: "Sun temple city" },
+
+  // Jharkhand
+  { name: "Ranchi, India", country: "India", code: "IN", description: "City of waterfalls" },
+  { name: "Jamshedpur, India", country: "India", code: "IN", description: "Steel city" },
+  { name: "Dhanbad, India", country: "India", code: "IN", description: "Coal capital" },
+  { name: "Bokaro, India", country: "India", code: "IN", description: "Steel city" },
+  { name: "Hazaribagh, India", country: "India", code: "IN", description: "City of thousand gardens" },
+  { name: "Deoghar, India", country: "India", code: "IN", description: "Temple city" },
+  { name: "Giridih, India", country: "India", code: "IN", description: "Mica city" },
+  { name: "Dumka, India", country: "India", code: "IN", description: "Cultural hub" },
+
+  // Northeast India Region
+  // Assam
+  { name: "Guwahati, India", country: "India", code: "IN", description: "Gateway to Northeast" },
+  { name: "Dibrugarh, India", country: "India", code: "IN", description: "Tea city" },
+  { name: "Silchar, India", country: "India", code: "IN", description: "Barak valley hub" },
+  { name: "Jorhat, India", country: "India", code: "IN", description: "Cultural capital" },
+  { name: "Nagaon, India", country: "India", code: "IN", description: "Agricultural hub" },
+  { name: "Tezpur, India", country: "India", code: "IN", description: "City of eternal romance" },
+  { name: "Kaziranga, India", country: "India", code: "IN", description: "National park" },
+  { name: "Majuli, India", country: "India", code: "IN", description: "World's largest river island" },
+
+  // Other Northeast States
+  { name: "Shillong, India", country: "India", code: "IN", description: "Scotland of the East" },
+  { name: "Aizawl, India", country: "India", code: "IN", description: "Capital of Mizoram" },
+  { name: "Imphal, India", country: "India", code: "IN", description: "Capital of Manipur" },
+  { name: "Agartala, India", country: "India", code: "IN", description: "Capital of Tripura" },
+  { name: "Kohima, India", country: "India", code: "IN", description: "Capital of Nagaland" },
+  { name: "Itanagar, India", country: "India", code: "IN", description: "Capital of Arunachal" },
+  { name: "Gangtok, India", country: "India", code: "IN", description: "Capital of Sikkim" },
+  { name: "Dimapur, India", country: "India", code: "IN", description: "Commercial capital of Nagaland" },
+
+  // West India Region
+  // Maharashtra
+  { name: "Mumbai, India", country: "India", code: "IN", description: "Financial capital" },
+  { name: "Pune, India", country: "India", code: "IN", description: "Cultural capital" },
+  { name: "Nagpur, India", country: "India", code: "IN", description: "Orange city" },
+  { name: "Nashik, India", country: "India", code: "IN", description: "Wine capital" },
+  { name: "Aurangabad, India", country: "India", code: "IN", description: "Tourism capital" },
+  { name: "Kolhapur, India", country: "India", code: "IN", description: "Historical city" },
+  { name: "Solapur, India", country: "India", code: "IN", description: "Textile hub" },
+  { name: "Amravati, India", country: "India", code: "IN", description: "Cultural city" },
+
+  // Gujarat
+  { name: "Ahmedabad, India", country: "India", code: "IN", description: "Manchester of India" },
+  { name: "Surat, India", country: "India", code: "IN", description: "Diamond city" },
+  { name: "Vadodara, India", country: "India", code: "IN", description: "Cultural capital" },
+  { name: "Rajkot, India", country: "India", code: "IN", description: "Engineering hub" },
+  { name: "Bhavnagar, India", country: "India", code: "IN", description: "Cultural center" },
+  { name: "Jamnagar, India", country: "India", code: "IN", description: "Oil city" },
+  { name: "Gandhinagar, India", country: "India", code: "IN", description: "State capital" },
+  { name: "Bhuj, India", country: "India", code: "IN", description: "Craft city" },
+
+  // Central India Region
+  // Madhya Pradesh
+  { name: "Bhopal, India", country: "India", code: "IN", description: "City of Lakes" },
+  { name: "Indore, India", country: "India", code: "IN", description: "Cleanest city" },
+  { name: "Jabalpur, India", country: "India", code: "IN", description: "Marble city" },
+  { name: "Gwalior, India", country: "India", code: "IN", description: "Historical city" },
+  { name: "Ujjain, India", country: "India", code: "IN", description: "Temple city" },
+  { name: "Sagar, India", country: "India", code: "IN", description: "University city" },
+  { name: "Rewa, India", country: "India", code: "IN", description: "White tiger city" },
+  { name: "Satna, India", country: "India", code: "IN", description: "Cement city" },
+
+  // Chhattisgarh
+  { name: "Raipur, India", country: "India", code: "IN", description: "Rice bowl" },
+  { name: "Bhilai, India", country: "India", code: "IN", description: "Steel city" },
+  { name: "Bilaspur, India", country: "India", code: "IN", description: "City of festivals" },
+  { name: "Korba, India", country: "India", code: "IN", description: "Power hub" },
+  { name: "Raigarh, India", country: "India", code: "IN", description: "Cultural capital" },
+  { name: "Jagdalpur, India", country: "India", code: "IN", description: "Tribal hub" },
+  { name: "Durg, India", country: "India", code: "IN", description: "Industrial city" },
+  { name: "Rajnandgaon, India", country: "India", code: "IN", description: "Historical city" },
+
+  // Union Territories
+  { name: "Chandigarh, India", country: "India", code: "IN", description: "The City Beautiful" },
+  { name: "Puducherry, India", country: "India", code: "IN", description: "French colonial town" },
+  { name: "Port Blair, India", country: "India", code: "IN", description: "Island capital" },
+  { name: "Daman, India", country: "India", code: "IN", description: "Portuguese influence" },
+  { name: "Diu, India", country: "India", code: "IN", description: "Beach paradise" },
+  { name: "Silvassa, India", country: "India", code: "IN", description: "DNH capital" },
+  { name: "Kavaratti, India", country: "India", code: "IN", description: "Lakshadweep capital" },
+  { name: "Jammu, India", country: "India", code: "IN", description: "Winter capital" }
+];
+
 // Step titles and avatars for gamification
 const steps = [
   { 
@@ -124,6 +340,12 @@ const steps = [
 export default function PlanTrip() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [startLocationSuggestions, setStartLocationSuggestions] = useState<typeof popularCities>([]);
+  const [destinationSuggestions, setDestinationSuggestions] = useState<typeof popularCities>([]);
+  const [showStartSuggestions, setShowStartSuggestions] = useState(false);
+  const [showDestSuggestions, setShowDestSuggestions] = useState(false);
+  const startLocationRef = useRef<HTMLDivElement>(null);
+  const destinationRef = useRef<HTMLDivElement>(null);
   
   // Form state using react-hook-form
   const methods = useForm({
@@ -213,6 +435,43 @@ export default function PlanTrip() {
     }
   };
   
+  // Filter cities based on input
+  const filterCities = (input: string) => {
+    if (input.length < 1) return [];
+    return popularCities.filter(city =>
+      city.name.toLowerCase().includes(input.toLowerCase()) ||
+      city.country.toLowerCase().includes(input.toLowerCase()) ||
+      city.description.toLowerCase().includes(input.toLowerCase())
+    );
+  };
+
+  // Update suggestions when start location changes
+  useEffect(() => {
+    const startLocation = methods.watch("startLocation");
+    setStartLocationSuggestions(filterCities(startLocation));
+  }, [methods.watch("startLocation")]);
+
+  // Update suggestions when destination changes
+  useEffect(() => {
+    const destination = methods.watch("destination");
+    setDestinationSuggestions(filterCities(destination));
+  }, [methods.watch("destination")]);
+
+  // Handle clicks outside suggestion boxes
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (startLocationRef.current && !startLocationRef.current.contains(event.target as Node)) {
+        setShowStartSuggestions(false);
+      }
+      if (destinationRef.current && !destinationRef.current.contains(event.target as Node)) {
+        setShowDestSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl relative">
       {showConfetti && <ReactConfetti recycle={false} numberOfPieces={500} />}
@@ -339,40 +598,106 @@ export default function PlanTrip() {
                       <div className="space-y-6">
                         <div className="space-y-2">
                           <Label htmlFor="startLocation">Your Current Location</Label>
-                          <div className="relative">
-                            <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                              id="startLocation" 
-                              placeholder="City, Country" 
-                              className="pl-10"
-                              {...methods.register("startLocation", { required: true })}
-                            />
+                          <div className="relative" ref={startLocationRef}>
+                            <div className="relative">
+                              <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                              <Input 
+                                id="startLocation" 
+                                placeholder="City, Country" 
+                                className="pl-10"
+                                {...methods.register("startLocation", { required: true })}
+                                onFocus={() => setShowStartSuggestions(true)}
+                              />
+                            </div>
+                            
+                            {/* Start Location suggestions dropdown */}
+                            {showStartSuggestions && startLocationSuggestions.length > 0 && (
+                              <div className="absolute z-50 w-full mt-2 bg-white rounded-lg shadow-lg max-h-96 overflow-y-auto border border-gray-200">
+                                {startLocationSuggestions.map((city, index) => (
+                                  <button
+                                    key={index}
+                                    className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b last:border-b-0 transition-colors"
+                                    onClick={() => {
+                                      methods.setValue("startLocation", city.name);
+                                      setShowStartSuggestions(false);
+                                    }}
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div className="flex-shrink-0 mt-1">
+                                        <MapPin className="h-5 w-5 text-goginie-primary" />
+                                      </div>
+                                      <div className="flex-grow">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium text-gray-900">{city.name}</span>
+                                          <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                                            {city.country}
+                                          </span>
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-1">{city.description}</p>
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="destination">Where do you want to go?</Label>
-                          <div className="relative">
-                            <Navigation className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                              id="destination" 
-                              placeholder="City, Country" 
-                              className="pl-10"
-                              {...methods.register("destination", { required: true })}
-                            />
+                          <div className="relative" ref={destinationRef}>
+                            <div className="relative">
+                              <Navigation className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                              <Input 
+                                id="destination" 
+                                placeholder="City, Country" 
+                                className="pl-10"
+                                {...methods.register("destination", { required: true })}
+                                onFocus={() => setShowDestSuggestions(true)}
+                              />
+                            </div>
+                            
+                            {/* Destination suggestions dropdown */}
+                            {showDestSuggestions && destinationSuggestions.length > 0 && (
+                              <div className="absolute z-50 w-full mt-2 bg-white rounded-lg shadow-lg max-h-96 overflow-y-auto border border-gray-200">
+                                {destinationSuggestions.map((city, index) => (
+                                  <button
+                                    key={index}
+                                    className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b last:border-b-0 transition-colors"
+                                    onClick={() => {
+                                      methods.setValue("destination", city.name);
+                                      setShowDestSuggestions(false);
+                                    }}
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div className="flex-shrink-0 mt-1">
+                                        <Navigation className="h-5 w-5 text-goginie-primary" />
+                                      </div>
+                                      <div className="flex-grow">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium text-gray-900">{city.name}</span>
+                                          <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                                            {city.country}
+                                          </span>
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-1">{city.description}</p>
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                         
                         {/* Map View */}
-                        {(methods.watch("startLocation") || methods.watch("destination")) && (
-                          <div className="mt-6 space-y-2">
-                            <Label>Route Preview</Label>
-                            <Map 
-                              startLocation={methods.watch("startLocation")} 
-                              destination={methods.watch("destination")} 
-                            />
-                          </div>
-                        )}
+                        <div className="mt-6 space-y-2">
+                          <Label>Route Preview</Label>
+                          <Map 
+                            startLocation={methods.watch("startLocation")} 
+                            destination={methods.watch("destination")} 
+                          />
+                        </div>
                       </div>
                     )}
 

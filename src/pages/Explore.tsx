@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,8 @@ import {
   Utensils, 
   Hotel,
   Star,
-  ArrowRight
+  ArrowRight,
+  Globe
 } from "lucide-react";
 
 // Sample destination data
@@ -80,15 +80,150 @@ const activities = [
   "Paragliding"
 ];
 
+// Enhanced list of popular cities with additional information
+const popularCities = [
+  // Major Indian Cities
+  { name: "Mumbai, India", country: "India", code: "IN", description: "Financial capital of India, home to Bollywood" },
+  { name: "Delhi, India", country: "India", code: "IN", description: "Capital city with rich history and modern charm" },
+  { name: "Bangalore, India", country: "India", code: "IN", description: "Silicon Valley of India, garden city" },
+  { name: "Hyderabad, India", country: "India", code: "IN", description: "City of Pearls and tech hub" },
+  { name: "Chennai, India", country: "India", code: "IN", description: "Gateway to South India, cultural capital" },
+  { name: "Kolkata, India", country: "India", code: "IN", description: "City of Joy, cultural and intellectual hub" },
+  { name: "Pune, India", country: "India", code: "IN", description: "Oxford of the East, cultural capital of Maharashtra" },
+  { name: "Ahmedabad, India", country: "India", code: "IN", description: "First UNESCO World Heritage City in India" },
+  { name: "Jaipur, India", country: "India", code: "IN", description: "Pink City, royal heritage of Rajasthan" },
+  
+  // Popular Tourist Destinations in India
+  { name: "Goa, India", country: "India", code: "IN", description: "Beach paradise with Portuguese heritage" },
+  { name: "Kerala, India", country: "India", code: "IN", description: "God's own country, famous for backwaters" },
+  { name: "Manali, India", country: "India", code: "IN", description: "Himalayan resort town, adventure sports hub" },
+  { name: "Rajasthan, India", country: "India", code: "IN", description: "Land of Kings, desert and palaces" },
+  { name: "Andaman Islands, India", country: "India", code: "IN", description: "Tropical paradise with pristine beaches" },
+  { name: "Darjeeling, India", country: "India", code: "IN", description: "Queen of Hills, famous for tea gardens" },
+  
+  // Additional Indian Cities
+  { name: "Agra, India", country: "India", code: "IN", description: "Home to the Taj Mahal, Mughal architecture" },
+  { name: "Varanasi, India", country: "India", code: "IN", description: "Spiritual capital of India, oldest living city" },
+  { name: "Udaipur, India", country: "India", code: "IN", description: "City of Lakes, Venice of the East" },
+  { name: "Amritsar, India", country: "India", code: "IN", description: "Home to Golden Temple, Punjabi culture" },
+  { name: "Rishikesh, India", country: "India", code: "IN", description: "Yoga capital of the world, spiritual hub" },
+  { name: "Shimla, India", country: "India", code: "IN", description: "Queen of Hills, former summer capital" },
+  { name: "Ooty, India", country: "India", code: "IN", description: "Queen of Nilgiris, hill station paradise" },
+  { name: "Mysore, India", country: "India", code: "IN", description: "City of Palaces, cultural capital of Karnataka" },
+  { name: "Ladakh, India", country: "India", code: "IN", description: "Land of high passes, Buddhist culture" },
+  { name: "Coorg, India", country: "India", code: "IN", description: "Scotland of India, coffee country" },
+  { name: "Munnar, India", country: "India", code: "IN", description: "Kashmir of South India, tea plantations" },
+  { name: "Hampi, India", country: "India", code: "IN", description: "UNESCO site, ancient Vijayanagara ruins" },
+  { name: "Kochi, India", country: "India", code: "IN", description: "Queen of Arabian Sea, historic port city" },
+  { name: "Mahabaleshwar, India", country: "India", code: "IN", description: "Strawberry country, hill station retreat" },
+  { name: "Pushkar, India", country: "India", code: "IN", description: "Holy city, famous for camel fair" },
+  { name: "Gangtok, India", country: "India", code: "IN", description: "Capital of Sikkim, gateway to Northeast" },
+  { name: "Alleppey, India", country: "India", code: "IN", description: "Venice of the East, backwater paradise" },
+  { name: "Madurai, India", country: "India", code: "IN", description: "Temple City, cultural center of Tamil Nadu" },
+  { name: "Khajuraho, India", country: "India", code: "IN", description: "Temple town, UNESCO World Heritage site" },
+  { name: "Ranthambore, India", country: "India", code: "IN", description: "Tiger reserve, wildlife sanctuary" },
+  { name: "Kovalam, India", country: "India", code: "IN", description: "Beach paradise of Kerala" },
+  { name: "Nainital, India", country: "India", code: "IN", description: "Lake District of India" },
+  { name: "Mussoorie, India", country: "India", code: "IN", description: "Queen of Hills, writer's paradise" },
+  { name: "Mahabalipuram, India", country: "India", code: "IN", description: "Ancient port city, shore temples" },
+  { name: "Pondicherry, India", country: "India", code: "IN", description: "French colonial town, spiritual hub" },
+  { name: "Jodhpur, India", country: "India", code: "IN", description: "Blue City, Mehrangarh Fort" },
+  { name: "Ajmer, India", country: "India", code: "IN", description: "Pilgrimage city, Dargah Sharif" },
+  { name: "Dehradun, India", country: "India", code: "IN", description: "Valley of Knowledge, education hub" },
+  { name: "Lucknow, India", country: "India", code: "IN", description: "City of Nawabs, culinary capital" },
+  { name: "Bhubaneswar, India", country: "India", code: "IN", description: "Temple City of India, ancient architecture" },
+
+  // Rest of the international cities...
+  { name: "New York, USA", country: "United States", code: "US", description: "The Big Apple" },
+  { name: "London, UK", country: "United Kingdom", code: "GB", description: "The Big Smoke" },
+  { name: "Paris, France", country: "France", code: "FR", description: "City of Light" },
+  { name: "Tokyo, Japan", country: "Japan", code: "JP", description: "Land of the Rising Sun" },
+  { name: "Dubai, UAE", country: "United Arab Emirates", code: "AE", description: "City of Gold" },
+  { name: "Singapore", country: "Singapore", code: "SG", description: "Lion City" },
+  { name: "Bangkok, Thailand", country: "Thailand", code: "TH", description: "City of Angels" },
+  { name: "Sydney, Australia", country: "Australia", code: "AU", description: "Harbour City" },
+  { name: "Rome, Italy", country: "Italy", code: "IT", description: "Eternal City" },
+  { name: "Barcelona, Spain", country: "Spain", code: "ES", description: "City of Counts" },
+  { name: "Amsterdam, Netherlands", country: "Netherlands", code: "NL", description: "Venice of the North" },
+  { name: "Vienna, Austria", country: "Austria", code: "AT", description: "City of Music" },
+  { name: "Prague, Czech Republic", country: "Czech Republic", code: "CZ", description: "City of a Hundred Spires" },
+  { name: "Budapest, Hungary", country: "Hungary", code: "HU", description: "Pearl of the Danube" },
+  { name: "Istanbul, Turkey", country: "Turkey", code: "TR", description: "City of the World's Desire" },
+  { name: "Cairo, Egypt", country: "Egypt", code: "EG", description: "City of a Thousand Minarets" },
+  { name: "Cape Town, South Africa", country: "South Africa", code: "ZA", description: "Mother City" },
+  { name: "Rio de Janeiro, Brazil", country: "Brazil", code: "BR", description: "Marvelous City" },
+  { name: "Buenos Aires, Argentina", country: "Argentina", code: "AR", description: "Paris of South America" },
+  { name: "Mexico City, Mexico", country: "Mexico", code: "MX", description: "City of Palaces" },
+  { name: "Toronto, Canada", country: "Canada", code: "CA", description: "The Six" },
+  { name: "Vancouver, Canada", country: "Canada", code: "CA", description: "Hollywood North" },
+  { name: "Seoul, South Korea", country: "South Korea", code: "KR", description: "The Soul of Asia" },
+  { name: "Hong Kong", country: "China", code: "HK", description: "Pearl of the Orient" },
+  { name: "Shanghai, China", country: "China", code: "CN", description: "Paris of the East" },
+  { name: "Moscow, Russia", country: "Russia", code: "RU", description: "Third Rome" },
+  { name: "St. Petersburg, Russia", country: "Russia", code: "RU", description: "Venice of the North" },
+  { name: "Berlin, Germany", country: "Germany", code: "DE", description: "Athens on the Spree" },
+  { name: "Munich, Germany", country: "Germany", code: "DE", description: "Athens of the Isar" },
+  { name: "Zurich, Switzerland", country: "Switzerland", code: "CH", description: "Little Big City" },
+  { name: "Geneva, Switzerland", country: "Switzerland", code: "CH", description: "Peace Capital" },
+  { name: "Oslo, Norway", country: "Norway", code: "NO", description: "Tiger City" },
+  { name: "Stockholm, Sweden", country: "Sweden", code: "SE", description: "Venice of the North" },
+  { name: "Copenhagen, Denmark", country: "Denmark", code: "DK", description: "City of Spires" },
+  { name: "Helsinki, Finland", country: "Finland", code: "FI", description: "Daughter of the Baltic" },
+  { name: "Reykjavik, Iceland", country: "Iceland", code: "IS", description: "Smoky Bay" },
+  { name: "Dublin, Ireland", country: "Ireland", code: "IE", description: "Fair City" },
+  { name: "Edinburgh, UK", country: "United Kingdom", code: "GB", description: "Athens of the North" },
+  { name: "Manchester, UK", country: "United Kingdom", code: "GB", description: "Cottonopolis" },
+  { name: "Liverpool, UK", country: "United Kingdom", code: "GB", description: "The Pool of Life" },
+  { name: "Glasgow, UK", country: "United Kingdom", code: "GB", description: "Dear Green Place" },
+  { name: "Birmingham, UK", country: "United Kingdom", code: "GB", description: "Workshop of the World" },
+  { name: "Cardiff, UK", country: "United Kingdom", code: "GB", description: "City of Castles" },
+  { name: "Belfast, UK", country: "United Kingdom", code: "GB", description: "Linenopolis" },
+  { name: "Wellington, New Zealand", country: "New Zealand", code: "NZ", description: "Windy City" },
+  { name: "Auckland, New Zealand", country: "New Zealand", code: "NZ", description: "City of Sails" },
+  { name: "Christchurch, New Zealand", country: "New Zealand", code: "NZ", description: "Garden City" },
+  { name: "Queenstown, New Zealand", country: "New Zealand", code: "NZ", description: "Adventure Capital" },
+  { name: "Rotorua, New Zealand", country: "New Zealand", code: "NZ", description: "Sulphur City" }
+];
+
 export default function Explore() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<typeof popularCities>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   
   const filteredDestinations = popularDestinations.filter(
     (dest) => dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
               dest.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
               dest.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
   );
-  
+
+  // Filter cities based on search query
+  useEffect(() => {
+    if (searchQuery.length < 1) { // Changed to show suggestions after 1 character
+      setSuggestions([]);
+      return;
+    }
+
+    const filtered = popularCities.filter(city => 
+      city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      city.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      city.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setSuggestions(filtered);
+  }, [searchQuery]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -97,7 +232,7 @@ export default function Explore() {
       className="container py-8 px-4"
     >
       {/* Hero section */}
-      <div className="relative rounded-3xl overflow-hidden mb-10">
+      <div className="relative mb-12 rounded-xl overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         <img 
           src="https://picsum.photos/1600/500?random=7" 
@@ -127,15 +262,53 @@ export default function Explore() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
             className="w-full max-w-md relative"
+            ref={searchRef}
           >
-            <Input 
-              type="text" 
-              placeholder="Search destinations, experiences, activities..." 
-              className="px-4 py-3 pl-12 bg-white/90 text-black rounded-full w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <div className="relative">
+              <Input 
+                type="text" 
+                placeholder="Search destinations, experiences, activities..." 
+                className="px-4 py-3 pl-12 bg-white/90 text-black rounded-full w-full"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+              />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            </div>
+            
+            {/* Enhanced location suggestions dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-50 w-full mt-2 bg-white rounded-lg shadow-lg max-h-96 overflow-y-auto">
+                {suggestions.map((city, index) => (
+                  <button
+                    key={index}
+                    className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b last:border-b-0 transition-colors"
+                    onClick={() => {
+                      setSearchQuery(city.name);
+                      setShowSuggestions(false);
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <MapPin className="h-5 w-5 text-goginie-primary" />
+                      </div>
+                      <div className="flex-grow">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900">{city.name}</span>
+                          <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                            {city.country}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">{city.description}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
         </div>
       </div>
