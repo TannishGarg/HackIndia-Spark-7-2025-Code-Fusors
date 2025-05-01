@@ -3,10 +3,23 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-const Map = ({ startLocation, destination, className }) => {
+interface MapCoordinates {
+  start?: [number, number];
+  startQuery?: string;
+  end?: [number, number];
+  endQuery?: string;
+}
+
+interface MapProps {
+  startLocation: string;
+  destination: string;
+  className?: string;
+}
+
+const Map = ({ startLocation, destination, className = "" }: MapProps) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [coordinates, setCoordinates] = useState({});
+  const [coordinates, setCoordinates] = useState<MapCoordinates>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -38,7 +51,7 @@ const Map = ({ startLocation, destination, className }) => {
     setError("");
     
     const fetchLocations = async () => {
-      const newCoordinates = { ...coordinates };
+      const newCoordinates: MapCoordinates = { ...coordinates };
       
       // Fetch start location coordinates if provided and not already fetched
       if (startLocation && (!coordinates.start || coordinates.startQuery !== startLocation)) {

@@ -1,12 +1,12 @@
-
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import { Map } from "@/components";
 import { 
   CalendarCheck, 
   Hotel, 
@@ -22,207 +22,276 @@ import {
   Edit
 } from "lucide-react";
 
-// Mock data for a trip to Paris
-const tripData = {
-  destination: "Paris, France",
-  dateRange: "May 12-18, 2025",
-  budget: {
-    total: 2000,
-    used: 1750,
-    breakdown: {
-      accommodation: 700,
-      food: 400,
-      activities: 350,
-      transportation: 300
-    }
-  },
-  duration: 7,
-  weather: [
-    { day: "Day 1", condition: "sunny", temp: "72°F" },
-    { day: "Day 2", condition: "partly-cloudy", temp: "68°F" },
-    { day: "Day 3", condition: "partly-cloudy", temp: "70°F" },
-    { day: "Day 4", condition: "sunny", temp: "75°F" },
-    { day: "Day 5", condition: "sunny", temp: "77°F" },
-    { day: "Day 6", condition: "cloudy", temp: "65°F" },
-    { day: "Day 7", condition: "partly-cloudy", temp: "68°F" }
-  ],
-  itinerary: [
-    {
-      day: "Day 1",
-      activities: [
-        { time: "9:00 AM", activity: "Arrive at Charles de Gaulle Airport" },
-        { time: "11:00 AM", activity: "Check-in at Hotel du Louvre" },
-        { time: "1:00 PM", activity: "Lunch at Café de Flore" },
-        { time: "3:00 PM", activity: "Visit the Eiffel Tower" },
-        { time: "7:00 PM", activity: "Dinner at Le Jules Verne" }
-      ]
-    },
-    {
-      day: "Day 2",
-      activities: [
-        { time: "9:00 AM", activity: "Breakfast at hotel" },
-        { time: "10:00 AM", activity: "Visit the Louvre Museum" },
-        { time: "1:00 PM", activity: "Lunch at Angelina" },
-        { time: "3:00 PM", activity: "Walk through Tuileries Garden" },
-        { time: "5:00 PM", activity: "Visit Champs-Élysées" },
-        { time: "8:00 PM", activity: "Dinner at L'Atelier de Joël Robuchon" }
-      ]
-    },
-    {
-      day: "Day 3",
-      activities: [
-        { time: "9:00 AM", activity: "Breakfast at hotel" },
-        { time: "10:00 AM", activity: "Visit Notre-Dame Cathedral" },
-        { time: "12:30 PM", activity: "Lunch at Le Petit Châtelet" },
-        { time: "2:00 PM", activity: "Explore Latin Quarter" },
-        { time: "4:00 PM", activity: "Visit Shakespeare and Company bookstore" },
-        { time: "7:00 PM", activity: "Seine River dinner cruise" }
-      ]
-    },
-    {
-      day: "Day 4",
-      activities: [
-        { time: "9:00 AM", activity: "Breakfast at hotel" },
-        { time: "10:00 AM", activity: "Visit Montmartre and Sacré-Cœur" },
-        { time: "1:00 PM", activity: "Lunch at La Maison Rose" },
-        { time: "3:00 PM", activity: "Visit Moulin Rouge" },
-        { time: "6:00 PM", activity: "Dinner at Le Consulat" }
-      ]
-    },
-    {
-      day: "Day 5",
-      activities: [
-        { time: "9:00 AM", activity: "Breakfast at hotel" },
-        { time: "10:00 AM", activity: "Day trip to Palace of Versailles" },
-        { time: "1:00 PM", activity: "Lunch at La Flottille" },
-        { time: "3:00 PM", activity: "Explore Versailles Gardens" },
-        { time: "7:00 PM", activity: "Return to Paris for dinner" }
-      ]
-    },
-    {
-      day: "Day 6",
-      activities: [
-        { time: "9:00 AM", activity: "Breakfast at hotel" },
-        { time: "10:00 AM", activity: "Visit Centre Pompidou" },
-        { time: "1:00 PM", activity: "Lunch at L'Avant Comptoir" },
-        { time: "3:00 PM", activity: "Shopping at Le Marais district" },
-        { time: "7:00 PM", activity: "Dinner at Breizh Café" }
-      ]
-    },
-    {
-      day: "Day 7",
-      activities: [
-        { time: "9:00 AM", activity: "Breakfast at hotel" },
-        { time: "10:00 AM", activity: "Visit the Catacombs" },
-        { time: "1:00 PM", activity: "Farewell lunch at Le Comptoir" },
-        { time: "3:00 PM", activity: "Last-minute souvenir shopping" },
-        { time: "6:00 PM", activity: "Depart for Charles de Gaulle Airport" }
-      ]
-    }
-  ],
-  hotels: [
-    {
-      name: "Hotel du Louvre",
-      address: "Place André Malraux, 75001 Paris, France",
-      rating: 4.5,
-      price: "$200/night",
-      amenities: ["Free WiFi", "Restaurant", "Bar", "Fitness center"],
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      name: "Hôtel Plaza Athénée",
-      address: "25 Avenue Montaigne, 75008 Paris, France",
-      rating: 5,
-      price: "$650/night",
-      amenities: ["Free WiFi", "Spa", "Restaurant", "Bar", "Fitness center"],
-      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      name: "Hôtel Le Meurice",
-      address: "228 Rue de Rivoli, 75001 Paris, France",
-      rating: 4.8,
-      price: "$450/night",
-      amenities: ["Free WiFi", "Spa", "Restaurant", "Bar"],
-      image: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2074&auto=format&fit=crop"
-    }
-  ],
-  restaurants: [
-    {
-      name: "Le Jules Verne",
-      cuisine: "French",
-      rating: 4.4,
-      priceRange: "$$$",
-      address: "Eiffel Tower, 2nd Floor, Avenue Gustave Eiffel, 75007 Paris",
-      image: "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?q=80&w=2071&auto=format&fit=crop"
-    },
-    {
-      name: "Café de Flore",
-      cuisine: "French",
-      rating: 4.2,
-      priceRange: "$$",
-      address: "172 Boulevard Saint-Germain, 75006 Paris",
-      image: "https://images.unsplash.com/photo-1525648199074-cee30ba79a4a?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      name: "L'Atelier de Joël Robuchon",
-      cuisine: "French",
-      rating: 4.7,
-      priceRange: "$$$$",
-      address: "5 Rue Montalembert, 75007 Paris",
-      image: "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?q=80&w=2074&auto=format&fit=crop"
-    },
-    {
-      name: "Angelina",
-      cuisine: "French, Cafe",
-      rating: 4.5,
-      priceRange: "$$",
-      address: "226 Rue de Rivoli, 75001 Paris",
-      image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop"
-    }
-  ],
-  transportation: {
-    fromAirport: {
-      options: ["Taxi", "Metro", "Bus"],
-      recommended: "Taxi",
-      cost: "€50-60"
-    },
-    localTransportation: {
-      options: ["Metro", "Bus", "Bike rental", "Walking"],
-      recommended: "Metro + Walking",
-      metroPass: "Paris Visite pass (5 days): €38.35"
-    }
-  },
-  packingList: [
-    "Passport and travel documents",
-    "Euros (cash)",
-    "Light jacket (evenings can be cool)",
-    "Comfortable walking shoes",
-    "Universal power adapter",
-    "Camera",
-    "Sunglasses",
-    "Umbrella (just in case)",
-    "French phrasebook or translation app"
-  ]
+// Exchange rate: 1 USD = 83.5 INR (as of May 1, 2025)
+const USD_TO_INR_RATE = 83.5;
+
+// Function to convert USD to INR
+const convertToINR = (usdAmount) => {
+  return Math.round(usdAmount * USD_TO_INR_RATE);
 };
 
-const WeatherIcon = ({ condition }: { condition: string }) => {
-  switch (condition) {
-    case "sunny":
-      return <Sun className="h-5 w-5 text-yellow-500" />;
-    case "partly-cloudy":
-      return <CloudSun className="h-5 w-5 text-blue-400" />;
-    case "cloudy":
-      return <Cloud className="h-5 w-5 text-gray-400" />;
-    default:
-      return <Sun className="h-5 w-5 text-yellow-500" />;
+// Helper function to format currency
+const formatCurrency = (amount, currency = "INR") => {
+  if (currency === "INR") {
+    return `₹${amount.toLocaleString()}`;
   }
+  return `$${amount.toLocaleString()}`;
 };
 
 export default function TripResult() {
+  const location = useLocation();
   const [activeItineraryDay, setActiveItineraryDay] = useState("Day 1");
   const { toast } = useToast();
+  const [tripData, setTripData] = useState(null);
+  
+  // Get trip data from location state or use default data
+  useEffect(() => {
+    const getDefaultData = () => {
+      // Check localStorage for saved trip data
+      const savedTripData = localStorage.getItem('plannedTrip');
+      if (savedTripData) {
+        try {
+          const parsed = JSON.parse(savedTripData);
+          return parsed;
+        } catch (e) {
+          console.error("Error parsing saved trip data:", e);
+        }
+      }
+      
+      // Default to Paris trip as fallback
+      return {
+        destination: "Paris, France",
+        startLocation: "London, UK",
+        dateRange: "May 12-18, 2025",
+        duration: 7,
+        budget: {
+          total: 2000,
+          used: 1750,
+          breakdown: {
+            accommodation: 700,
+            food: 400,
+            activities: 350,
+            transportation: 300
+          }
+        },
+        weather: [
+          { day: "Day 1", condition: "sunny", temp: "72°F" },
+          { day: "Day 2", condition: "partly-cloudy", temp: "68°F" },
+          { day: "Day 3", condition: "partly-cloudy", temp: "70°F" },
+          { day: "Day 4", condition: "sunny", temp: "75°F" },
+          { day: "Day 5", condition: "sunny", temp: "77°F" },
+          { day: "Day 6", condition: "cloudy", temp: "65°F" },
+          { day: "Day 7", condition: "partly-cloudy", temp: "68°F" }
+        ],
+        itinerary: [
+          {
+            day: "Day 1",
+            activities: [
+              { time: "9:00 AM", activity: "Arrive at Charles de Gaulle Airport" },
+              { time: "11:00 AM", activity: "Check-in at Hotel du Louvre" },
+              { time: "1:00 PM", activity: "Lunch at Café de Flore" },
+              { time: "3:00 PM", activity: "Visit the Eiffel Tower" },
+              { time: "7:00 PM", activity: "Dinner at Le Jules Verne" }
+            ]
+          },
+          {
+            day: "Day 2",
+            activities: [
+              { time: "9:00 AM", activity: "Breakfast at hotel" },
+              { time: "10:00 AM", activity: "Visit the Louvre Museum" },
+              { time: "1:00 PM", activity: "Lunch at Angelina" },
+              { time: "3:00 PM", activity: "Walk through Tuileries Garden" },
+              { time: "5:00 PM", activity: "Visit Champs-Élysées" },
+              { time: "8:00 PM", activity: "Dinner at L'Atelier de Joël Robuchon" }
+            ]
+          },
+          {
+            day: "Day 3",
+            activities: [
+              { time: "9:00 AM", activity: "Breakfast at hotel" },
+              { time: "10:00 AM", activity: "Visit Notre-Dame Cathedral" },
+              { time: "12:30 PM", activity: "Lunch at Le Petit Châtelet" },
+              { time: "2:00 PM", activity: "Explore Latin Quarter" },
+              { time: "4:00 PM", activity: "Visit Shakespeare and Company bookstore" },
+              { time: "7:00 PM", activity: "Seine River dinner cruise" }
+            ]
+          },
+          {
+            day: "Day 4",
+            activities: [
+              { time: "9:00 AM", activity: "Breakfast at hotel" },
+              { time: "10:00 AM", activity: "Visit Montmartre and Sacré-Cœur" },
+              { time: "1:00 PM", activity: "Lunch at La Maison Rose" },
+              { time: "3:00 PM", activity: "Visit Moulin Rouge" },
+              { time: "6:00 PM", activity: "Dinner at Le Consulat" }
+            ]
+          },
+          {
+            day: "Day 5",
+            activities: [
+              { time: "9:00 AM", activity: "Breakfast at hotel" },
+              { time: "10:00 AM", activity: "Day trip to Palace of Versailles" },
+              { time: "1:00 PM", activity: "Lunch at La Flottille" },
+              { time: "3:00 PM", activity: "Explore Versailles Gardens" },
+              { time: "7:00 PM", activity: "Return to Paris for dinner" }
+            ]
+          },
+          {
+            day: "Day 6",
+            activities: [
+              { time: "9:00 AM", activity: "Breakfast at hotel" },
+              { time: "10:00 AM", activity: "Visit Centre Pompidou" },
+              { time: "1:00 PM", activity: "Lunch at L'Avant Comptoir" },
+              { time: "3:00 PM", activity: "Shopping at Le Marais district" },
+              { time: "7:00 PM", activity: "Dinner at Breizh Café" }
+            ]
+          },
+          {
+            day: "Day 7",
+            activities: [
+              { time: "9:00 AM", activity: "Breakfast at hotel" },
+              { time: "10:00 AM", activity: "Visit the Catacombs" },
+              { time: "1:00 PM", activity: "Farewell lunch at Le Comptoir" },
+              { time: "3:00 PM", activity: "Last-minute souvenir shopping" },
+              { time: "6:00 PM", activity: "Depart for Charles de Gaulle Airport" }
+            ]
+          }
+        ],
+        hotels: [
+          {
+            name: "Hotel du Louvre",
+            address: "Place André Malraux, 75001 Paris, France",
+            rating: 4.5,
+            price: "$200/night",
+            amenities: ["Free WiFi", "Restaurant", "Bar", "Fitness center"],
+            image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop"
+          },
+          {
+            name: "Hôtel Plaza Athénée",
+            address: "25 Avenue Montaigne, 75008 Paris, France",
+            rating: 5,
+            price: "$650/night",
+            amenities: ["Free WiFi", "Spa", "Restaurant", "Bar", "Fitness center"],
+            image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=2070&auto=format&fit=crop"
+          },
+          {
+            name: "Hôtel Le Meurice",
+            address: "228 Rue de Rivoli, 75001 Paris, France",
+            rating: 4.8,
+            price: "$450/night",
+            amenities: ["Free WiFi", "Spa", "Restaurant", "Bar"],
+            image: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2074&auto=format&fit=crop"
+          }
+        ],
+        restaurants: [
+          {
+            name: "Le Jules Verne",
+            cuisine: "French",
+            rating: 4.4,
+            priceRange: "$$$",
+            address: "Eiffel Tower, 2nd Floor, Avenue Gustave Eiffel, 75007 Paris",
+            image: "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?q=80&w=2071&auto=format&fit=crop"
+          },
+          {
+            name: "Café de Flore",
+            cuisine: "French",
+            rating: 4.2,
+            priceRange: "$$",
+            address: "172 Boulevard Saint-Germain, 75006 Paris",
+            image: "https://images.unsplash.com/photo-1525648199074-cee30ba79a4a?q=80&w=2070&auto=format&fit=crop"
+          },
+          {
+            name: "L'Atelier de Joël Robuchon",
+            cuisine: "French",
+            rating: 4.7,
+            priceRange: "$$$$",
+            address: "5 Rue Montalembert, 75007 Paris",
+            image: "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?q=80&w=2074&auto=format&fit=crop"
+          },
+          {
+            name: "Angelina",
+            cuisine: "French, Cafe",
+            rating: 4.5,
+            priceRange: "$$",
+            address: "226 Rue de Rivoli, 75001 Paris",
+            image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop"
+          }
+        ],
+        transportation: {
+          fromAirport: {
+            options: ["Taxi", "Metro", "Bus"],
+            recommended: "Taxi",
+            cost: "€50-60"
+          },
+          localTransportation: {
+            options: ["Metro", "Bus", "Bike rental", "Walking"],
+            recommended: "Metro + Walking",
+            metroPass: "Paris Visite pass (5 days): €38.35"
+          }
+        },
+        packingList: [
+          "Passport and travel documents",
+          "Euros (cash)",
+          "Light jacket (evenings can be cool)",
+          "Comfortable walking shoes",
+          "Universal power adapter",
+          "Camera",
+          "Sunglasses",
+          "Umbrella (just in case)",
+          "French phrasebook or translation app"
+        ]
+      };
+    };
+    
+    // Use location state data if available, otherwise use default/saved data
+    const data = location.state?.tripData || getDefaultData();
+    
+    // Process data and convert currencies
+    const processedData = {
+      ...data,
+      budget: {
+        ...data.budget,
+        total: data.budget.total,
+        used: data.budget.used,
+        breakdown: {
+          ...data.budget.breakdown
+        }
+      }
+    };
+    
+    // Update hotels pricing to INR
+    if (processedData.hotels) {
+      processedData.hotels = processedData.hotels.map(hotel => {
+        const priceText = hotel.price;
+        if (priceText.includes("$")) {
+          const priceValue = parseInt(priceText.replace(/[^\d]/g, ''));
+          const inrPrice = convertToINR(priceValue);
+          return {
+            ...hotel,
+            price: `₹${inrPrice.toLocaleString()}/night`
+          };
+        }
+        return hotel;
+      });
+    }
+    
+    // Update restaurant pricing to INR (priceRange)
+    if (processedData.restaurants) {
+      processedData.restaurants = processedData.restaurants.map(restaurant => ({
+        ...restaurant,
+        priceRange: restaurant.priceRange.replace(/\$/g, "₹")
+      }));
+    }
+    
+    setTripData(processedData);
+  }, [location]);
   
   const handleSaveTrip = () => {
+    // Save trip data to localStorage
+    if (tripData) {
+      localStorage.setItem('savedTrip', JSON.stringify(tripData));
+    }
+    
     toast({
       title: "Trip saved!",
       description: "Your trip has been saved to your account.",
@@ -242,6 +311,18 @@ export default function TripResult() {
       description: "Your trip details will be downloaded as a PDF.",
     });
   };
+  
+  // Handle loading state
+  if (!tripData) {
+    return (
+      <div className="container mx-auto py-8 px-4 flex justify-center">
+        <div className="text-center">
+          <p className="mb-4 text-lg">Loading your trip details...</p>
+          <div className="w-16 h-16 border-4 border-t-goginie-primary border-gray-200 border-solid rounded-full animate-spin mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
   
   const budgetRemainingPercentage = Math.round(((tripData.budget.total - tripData.budget.used) / tripData.budget.total) * 100);
   
@@ -287,7 +368,7 @@ export default function TripResult() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-nowrap overflow-x-auto gap-2 pb-4">
-                {tripData.itinerary.map((day) => (
+                {tripData.itinerary?.map((day) => (
                   <Button
                     key={day.day}
                     variant={activeItineraryDay === day.day ? "default" : "outline"}
@@ -296,12 +377,12 @@ export default function TripResult() {
                   >
                     {day.day}
                   </Button>
-                ))}
+                )) || <p>No itinerary available</p>}
               </div>
               
               <div className="mt-4">
                 {tripData.itinerary
-                  .filter((day) => day.day === activeItineraryDay)
+                  ?.filter((day) => day.day === activeItineraryDay)
                   .map((day, idx) => (
                     <div key={idx} className="space-y-4">
                       {day.activities.map((activity, actIdx) => (
@@ -320,7 +401,7 @@ export default function TripResult() {
                         </div>
                       ))}
                     </div>
-                  ))}
+                  )) || <p>No activities available for this day.</p>}
               </div>
             </CardContent>
           </Card>
@@ -343,7 +424,7 @@ export default function TripResult() {
             
             <TabsContent value="hotels" className="pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {tripData.hotels.map((hotel, index) => (
+                {tripData.hotels?.map((hotel, index) => (
                   <Card key={index} className="overflow-hidden">
                     <div 
                       className="h-40 bg-cover bg-center" 
@@ -378,13 +459,13 @@ export default function TripResult() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                )) || <p>No hotels available.</p>}
               </div>
             </TabsContent>
             
             <TabsContent value="restaurants" className="pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {tripData.restaurants.map((restaurant, index) => (
+                {tripData.restaurants?.map((restaurant, index) => (
                   <Card key={index} className="overflow-hidden">
                     <div 
                       className="h-40 bg-cover bg-center" 
@@ -419,40 +500,57 @@ export default function TripResult() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                )) || <p>No restaurants available.</p>}
               </div>
             </TabsContent>
             
             <TabsContent value="transportation" className="pt-4">
               <Card>
                 <CardContent className="p-6 space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Airport Transfer</h3>
-                    <p><span className="font-medium">Recommended:</span> {tripData.transportation.fromAirport.recommended}</p>
-                    <p><span className="font-medium">Estimated Cost:</span> {tripData.transportation.fromAirport.cost}</p>
-                    <p className="mt-2 text-sm">Other options: {tripData.transportation.fromAirport.options.join(", ")}</p>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Local Transportation</h3>
-                    <p><span className="font-medium">Recommended:</span> {tripData.transportation.localTransportation.recommended}</p>
-                    <p><span className="font-medium">Metro Pass:</span> {tripData.transportation.localTransportation.metroPass}</p>
-                    <p className="mt-2 text-sm">All options: {tripData.transportation.localTransportation.options.join(", ")}</p>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div>
-                    <h3 className="font-semibold text-lg mb-3">Transportation Tips</h3>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>The Paris Metro is efficient and covers most tourist destinations.</li>
-                      <li>Buy a carnet (book of 10 tickets) to save money if not getting a pass.</li>
-                      <li>Many attractions are within walking distance of each other.</li>
-                      <li>Uber and taxis are readily available but more expensive.</li>
-                    </ul>
-                  </div>
+                  {tripData.transportation ? (
+                    <>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">Airport Transfer</h3>
+                        <p><span className="font-medium">Recommended:</span> {tripData.transportation.fromAirport.recommended}</p>
+                        <p><span className="font-medium">Estimated Cost:</span> {
+                          tripData.transportation.fromAirport.cost.includes("€") 
+                            ? tripData.transportation.fromAirport.cost 
+                            : tripData.transportation.fromAirport.cost.includes("$")
+                              ? `₹${convertToINR(parseInt(tripData.transportation.fromAirport.cost.replace(/[^\d]/g, '')))}`
+                              : tripData.transportation.fromAirport.cost
+                        }</p>
+                        <p className="mt-2 text-sm">Other options: {tripData.transportation.fromAirport.options.join(", ")}</p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">Local Transportation</h3>
+                        <p><span className="font-medium">Recommended:</span> {tripData.transportation.localTransportation.recommended}</p>
+                        <p><span className="font-medium">Transit Pass:</span> {
+                          tripData.transportation.localTransportation.metroPass && 
+                          (tripData.transportation.localTransportation.metroPass.includes("$") 
+                            ? `₹${convertToINR(parseInt(tripData.transportation.localTransportation.metroPass.replace(/[^\d]/g, '')))}`
+                            : tripData.transportation.localTransportation.metroPass)
+                        }</p>
+                        <p className="mt-2 text-sm">All options: {tripData.transportation.localTransportation.options.join(", ")}</p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="font-semibold text-lg mb-3">Transportation Tips</h3>
+                        <ul className="list-disc pl-5 space-y-1">
+                          <li>Use ride-sharing apps for convenience.</li>
+                          <li>Look for day passes on public transportation to save money.</li>
+                          <li>Many attractions may be within walking distance.</li>
+                          <li>Consider renting bicycles if available.</li>
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <p>No transportation data available.</p>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -461,15 +559,23 @@ export default function TripResult() {
         
         {/* Right column */}
         <div className="space-y-6">
-          {/* Map placeholder */}
+          {/* Map */}
           <Card>
             <CardContent className="p-0">
-              <div className="bg-muted w-full h-[300px] flex items-center justify-center">
-                <div className="text-center">
-                  <MapIcon className="h-10 w-10 text-muted-foreground mb-2 mx-auto" />
-                  <p className="text-sm text-muted-foreground">Interactive map view</p>
+              {tripData.startLocation ? (
+                <Map 
+                  startLocation={tripData.startLocation} 
+                  destination={tripData.destination} 
+                  className="w-full" 
+                />
+              ) : (
+                <div className="bg-muted w-full h-[300px] flex items-center justify-center">
+                  <div className="text-center">
+                    <MapIcon className="h-10 w-10 text-muted-foreground mb-2 mx-auto" />
+                    <p className="text-sm text-muted-foreground">Map data unavailable</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
           
@@ -482,12 +588,12 @@ export default function TripResult() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm">Budget Remaining</span>
-                  <span className="font-medium">${tripData.budget.total - tripData.budget.used}</span>
+                  <span className="font-medium">{formatCurrency(convertToINR(tripData.budget.total - tripData.budget.used))}</span>
                 </div>
                 <Progress value={budgetRemainingPercentage} className="h-2" />
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Used: ${tripData.budget.used}</span>
-                  <span>Total: ${tripData.budget.total}</span>
+                  <span>Used: {formatCurrency(convertToINR(tripData.budget.used))}</span>
+                  <span>Total: {formatCurrency(convertToINR(tripData.budget.total))}</span>
                 </div>
               </div>
               
@@ -498,19 +604,19 @@ export default function TripResult() {
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span>Accommodation</span>
-                    <span>${tripData.budget.breakdown.accommodation}</span>
+                    <span>{formatCurrency(convertToINR(tripData.budget.breakdown.accommodation))}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Food</span>
-                    <span>${tripData.budget.breakdown.food}</span>
+                    <span>{formatCurrency(convertToINR(tripData.budget.breakdown.food))}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Activities</span>
-                    <span>${tripData.budget.breakdown.activities}</span>
+                    <span>{formatCurrency(convertToINR(tripData.budget.breakdown.activities))}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Transportation</span>
-                    <span>${tripData.budget.breakdown.transportation}</span>
+                    <span>{formatCurrency(convertToINR(tripData.budget.breakdown.transportation))}</span>
                   </div>
                 </div>
               </div>
@@ -523,17 +629,21 @@ export default function TripResult() {
               <CardTitle className="text-lg">Weather Forecast</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-7 gap-1">
-                {tripData.weather.map((day, index) => (
-                  <div key={index} className="text-center">
-                    <p className="text-xs">{day.day.split(" ")[1]}</p>
-                    <div className="flex justify-center my-1">
-                      <WeatherIcon condition={day.condition} />
+              {tripData.weather ? (
+                <div className="grid grid-cols-7 gap-1">
+                  {tripData.weather.map((day, index) => (
+                    <div key={index} className="text-center">
+                      <p className="text-xs">{day.day.split(" ")[1]}</p>
+                      <div className="flex justify-center my-1">
+                        <WeatherIcon condition={day.condition} />
+                      </div>
+                      <p className="text-xs font-medium">{day.temp}</p>
                     </div>
-                    <p className="text-xs font-medium">{day.temp}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-sm text-muted-foreground">Weather forecast unavailable</p>
+              )}
             </CardContent>
           </Card>
           
@@ -543,27 +653,31 @@ export default function TripResult() {
               <CardTitle className="text-lg">Packing List</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
-                {tripData.packingList.map((item, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm">
-                    <div className="h-5 w-5 rounded-sm border flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-3.5 w-3.5"
-                      >
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    </div>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              {tripData.packingList ? (
+                <ul className="space-y-2">
+                  {tripData.packingList.map((item, index) => (
+                    <li key={index} className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-sm border flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-3.5 w-3.5"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center text-sm text-muted-foreground">No packing list available</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -571,3 +685,10 @@ export default function TripResult() {
     </div>
   );
 }
+
+const WeatherIcon = ({ condition }: { condition: string }) => {
+  switch (condition) {
+    case "sunny":
+      return <Sun className="h-5 w-5 text-yellow-500" />;
+    case "partly-cloudy":
+      return <CloudSun className="h-5 w-5
