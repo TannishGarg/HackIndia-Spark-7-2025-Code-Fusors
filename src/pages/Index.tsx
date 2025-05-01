@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,8 @@ import {
   CheckCircle, 
   UserCheck, 
   Camera, 
-  LayoutGrid
+  LayoutGrid,
+  Heart
 } from "lucide-react";
 
 // Popular destinations
@@ -147,6 +147,13 @@ export default function Index() {
                     </Button>
                   </Link>
                 </form>
+                
+                {/* New mood-based planning link */}
+                <div className="mt-3 text-center">
+                  <Link to="/mood-trip" className="flex items-center justify-center gap-1 text-goginie-primary hover:underline text-sm">
+                    <Heart className="h-3 w-3" /> Try our new mood-based recommendations
+                  </Link>
+                </div>
               </div>
               
               <div className="flex items-center mt-8 gap-6">
@@ -273,6 +280,85 @@ export default function Index() {
                 Start Planning Now <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+      
+      {/* New Section: Mood-Based Planning */}
+      <section className="py-16 bg-goginie-soft-purple/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <span className="inline-flex items-center rounded-full border border-goginie-primary bg-goginie-primary/10 px-3 py-1 text-sm text-goginie-primary mb-4">
+              <span className="mr-1">🎉</span> New Feature
+            </span>
+            <h2 className="text-3xl font-bold mb-4">Mood-Based Travel Recommendations</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Tell us how you're feeling right now and we'll suggest the perfect activities for your current mood and energy level.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-6">
+              <div className="flex gap-4 items-start">
+                <div className="bg-white p-3 rounded-full shadow-sm">
+                  <Heart className="h-6 w-6 text-pink-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Feeling Romantic?</h3>
+                  <p className="text-muted-foreground">
+                    Discover intimate dining spots, scenic sunset viewpoints, and charming activities perfect for couples.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-4 items-start">
+                <div className="bg-white p-3 rounded-full shadow-sm">
+                  <Utensils className="h-6 w-6 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Hungry Traveler?</h3>
+                  <p className="text-muted-foreground">
+                    Find the best local eateries, food markets, and culinary experiences tailored to your taste preferences.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-4 items-start">
+                <div className="bg-white p-3 rounded-full shadow-sm">
+                  <Compass className="h-6 w-6 text-yellow-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Feeling Adventurous?</h3>
+                  <p className="text-muted-foreground">
+                    Explore thrilling activities, hidden gems, and off-the-beaten-path experiences for the daring traveler.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-8 text-center md:text-left">
+                <Link to="/mood-trip">
+                  <Button className="bg-goginie-primary hover:bg-goginie-secondary">
+                    Try Mood-Based Planning <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070&auto=format&fit=crop" 
+                alt="Mood-based travel planning" 
+                className="rounded-lg shadow-lg"
+              />
+              <div className="absolute top-4 right-4 bg-white p-3 rounded-lg shadow-md">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="font-medium">Current mood:</span>
+                  <span className="text-yellow-600 flex items-center">
+                    <Compass className="h-4 w-4 mr-1" /> Adventurous
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

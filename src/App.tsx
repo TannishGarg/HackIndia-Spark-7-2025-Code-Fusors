@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Explore from "./pages/Explore";
 import Contact from "./pages/Contact";
+import MoodBasedTrip from "./pages/MoodBasedTrip";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
           <Route path="/plan-trip" element={<Layout><PlanTrip /></Layout>} />
           <Route path="/trip-result" element={<Layout><TripResult /></Layout>} />
+          <Route path="/mood-trip" element={<Layout><MoodBasedTrip /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
           <Route path="/explore" element={<Layout><Explore /></Layout>} />
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
