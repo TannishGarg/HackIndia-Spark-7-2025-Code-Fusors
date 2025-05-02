@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Compass } from "lucide-react";
+import { Compass, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface FormActionsProps {
@@ -24,9 +24,10 @@ export default function FormActions({ isSubmitting = false }: FormActionsProps) 
         type="button" 
         variant="outline"
         className="flex-1"
-        onClick={() => navigate("/plan-trip")}
+        onClick={() => navigate("/explore")}
       >
-        Back to Traditional Planning
+        <MapPin className="mr-2 h-5 w-5" />
+        Explore Destinations
       </Button>
     </div>
   );

@@ -2,6 +2,24 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { Compass } from "lucide-react";
+
+// Fix for marker icons not showing up
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Create custom marker icon
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Set the default icon for all markers
+L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapCoordinates {
   start?: [number, number];
@@ -113,13 +131,13 @@ const Map = ({ startLocation, destination, className = "" }: MapProps) => {
     
     // Add markers for start and destination
     if (coordinates.start) {
-      L.marker([coordinates.start[0], coordinates.start[1]])
+      L.marker([coordinates.start[0], coordinates.start[1]], { icon: DefaultIcon })
         .addTo(map.current)
         .bindPopup(`Start: ${startLocation}`);
     }
     
     if (coordinates.end) {
-      L.marker([coordinates.end[0], coordinates.end[1]])
+      L.marker([coordinates.end[0], coordinates.end[1]], { icon: DefaultIcon })
         .addTo(map.current)
         .bindPopup(`Destination: ${destination}`);
     }
@@ -168,9 +186,18 @@ const Map = ({ startLocation, destination, className = "" }: MapProps) => {
         </div>
       )}
       
+      {!coordinates.end && !isLoading && (
+        <div className="flex items-center justify-center bg-gray-100 h-[300px] rounded-lg border">
+          <div className="text-center text-muted-foreground">
+            <Compass className="h-10 w-10 mb-2 mx-auto" />
+            <p>Select a destination to view on the map</p>
+          </div>
+        </div>
+      )}
+      
       <div 
         ref={mapContainer}
-        className={`h-[300px] rounded-lg border ${className}`}
+        className={`h-[300px] rounded-lg border ${className} ${!coordinates.end && !isLoading ? 'hidden' : ''}`}
       />
     </div>
   );
